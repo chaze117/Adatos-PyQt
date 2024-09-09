@@ -4,6 +4,9 @@ from PyQt5.QtCore import *
 import Components.foadatok as foadatok
 import Components.orvosi as orvosi
 import Components.programok as programok
+import Components.tuzelo as tuzelo
+import Components.munkairanyito as munkairanyito
+import Components.beallitasok as beallitasok
 
 class Tabs(QWidget):
     def __init__(self, parent):
@@ -15,9 +18,9 @@ class Tabs(QWidget):
         self.tab1 = foadatok.FoAdatok(self.tabs)
         self.tab2 = orvosi.Orvosi(self.tabs)
         self.tab3 = programok.Programok(self.tabs)
-        self.tab4 = QWidget()
-        self.tab5 = QWidget()
-        self.tab6 = QWidget()        
+        self.tab4 = tuzelo.Tuzelo(self.tabs)
+        self.tab5 = munkairanyito.Munkairanyito(self.tabs)
+        self.tab6 = beallitasok.Beallitasok(self.tabs)   
         # Add tabs
         self.tabs.addTab(self.tab1,"Fő Adatok")
         self.tabs.addTab(self.tab2,"Orvosi")

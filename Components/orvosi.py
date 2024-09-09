@@ -73,7 +73,7 @@ class Orvosi(QWidget):
         self.Grid2.layout = QGridLayout()
         self.Grid2.setLayout(self.Grid2.layout)
         self.bottomFrame.layout.addWidget(self.Grid2,2,0)
-        self.Grid2.setFixedSize(105,60)
+        self.Grid2.setFixedSize(105,65)
 
         self.newD = QPushButton(qta.icon('mdi.format-list-bulleted'),"")
         self.newD.setIconSize(QSize(40,40))

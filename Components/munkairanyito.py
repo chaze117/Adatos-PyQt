@@ -3,12 +3,13 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import qtawesome as qta
 import re
+from datetime import datetime as DT
 
 class TableModel(QAbstractTableModel):
     def __init__(self, data):
         super(TableModel, self).__init__()
         self._data = data
-        self.hheaders = ["ID","Név","Születési Idő","TAJ Szám","Adóazonosító","Jogviszony kezdete", "CSJK","NÉTAK"]
+        self.hheaders = ["ID","Név","Születési Idő","TAJ Szám","Jogviszony Vége"]
 
 
     def data(self, index, role):
@@ -33,24 +34,24 @@ class TableModel(QAbstractTableModel):
             if orientation == Qt.Horizontal:
                 return self.hheaders[section]
         return QVariant()
-
-class Programok(QWidget):
+    
+class Munkairanyito(QWidget):
     def __init__(self, parent):
         super(QWidget,self).__init__(parent)
-        self.progCB = QComboBox(editable=True)
+        self.munkCB = QComboBox(editable=True)
 
         self.layout = QVBoxLayout(self)
-        self.layout.addWidget(self.progCB)
+        self.layout.addWidget(self.munkCB)
         self.table = QTableView()
         self.layout.addWidget(self.table)
-
         data = [
-            ["1", "Nagy Péter", "1991.08.20",   "044138370","8455211814", "2024.09.01","0","0"],
-            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
-            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
-            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
-            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
-            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
+            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
+            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
+            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
+            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
+            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
+            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
+            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
             ]
 
 
@@ -58,27 +59,28 @@ class Programok(QWidget):
         self.model = TableModel(data)
         self.table.setModel(self.model)
         
+        self.BF = QFrame()
+        self.BF.layout=QVBoxLayout()
+        self.BF.setLayout(self.BF.layout)
+        self.layout.addWidget(self.BF)
+        self.BF.setFixedSize(200,50)
+
+        self.honap = QDateEdit()
+        self.honap.setDisplayFormat("yyyy.MMMM")
+        self.BF.layout.addWidget(self.honap)
+        self.honap.setDate(QDate(DT.now().year,DT.now().month,DT.now().day))
+
+
         self.bottomFrame = QFrame()
-        self.bottomFrame.setFixedSize(110,65)
+        self.bottomFrame.setFixedSize(65,65)
         self.layout.addWidget(self.bottomFrame)
         self.bottomFrame.layout = QGridLayout()
         self.bottomFrame.setLayout(self.bottomFrame.layout)
 
+        
 
-
-        self.newD = QPushButton(qta.icon('mdi6.account-arrow-down'),"")
+        self.newD = QPushButton(qta.icon('fa5s.book-open'),"")
         self.newD.setIconSize(QSize(40,40))
-        self.newD.setToolTip("Munkaerőigény")
+        self.newD.setToolTip("Jelenléti nyomtatása")
         self.bottomFrame.layout.addWidget(self.newD,0,0)
-
-        self.newD2 = QPushButton(qta.icon('ei.pencil'),"")
-        self.newD2.setIconSize(QSize(40,40))
-        self.newD2.setToolTip("Átnevezés elektronikus beküldéshez")
-
-        self.bottomFrame.layout.addWidget(self.newD2,0,1)
-
-
-
         self.setLayout(self.layout)
-    def update(self,value):
-        self.oLabel.setText(f"Lejár {value} napon belül")
