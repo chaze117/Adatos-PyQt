@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import qtawesome as qta
 
-import Components.telepulesek as telep
+
 class FoAdatok(QWidget):
     def __init__(self, parent):
         super(QWidget,self).__init__(parent)
@@ -55,9 +55,8 @@ class SzemelyiAdatok(QGroupBox):
         self.layout.addWidget(self.lnameT,2,1)
         self.szhL = QLabel("Születési Hely:")
         self.layout.addWidget(self.szhL,3,0)
-        self.szhC =QComboBox(editable=True)
-        self.szhC.addItems(telep.telepulesek)
-        self.layout.addWidget(self.szhC,3,1)
+        self.szhT = QLineEdit()
+        self.layout.addWidget(self.szhT,3,1)
         self.sziL =QLabel("Születési Idő:")
         self.layout.addWidget(self.sziL,4,0)
         self.sziD = QDateEdit(calendarPopup=True)
@@ -135,9 +134,8 @@ class CSJK(QFrame):
         self.CSJKFrame.layout.addWidget(self.anevT,1,1)
         self.szhL = QLabel("Születési Hely:")
         self.CSJKFrame.layout.addWidget(self.szhL,2,0)
-        self.szhC = QComboBox(editable=True)
-        self.szhC.addItems(telep.telepulesek)
-        self.CSJKFrame.layout.addWidget(self.szhC,2,1)
+        self.szhT = QLineEdit()
+        self.CSJKFrame.layout.addWidget(self.szhT,2,1)
         self.sziL = QLabel("Születési Idő")
         self.CSJKFrame.layout.addWidget(self.sziL,3,0)
         self.sziD = QDateEdit(calendarPopup=True)
@@ -215,9 +213,8 @@ class NETAK(QFrame):
         self.NETAKFrame.layout.addWidget(self.anevT,1,1)
         self.szhL = QLabel("Születési Hely:")
         self.NETAKFrame.layout.addWidget(self.szhL,2,0)
-        self.szhC = QComboBox(editable=True)
-        self.szhC.addItems(telep.telepulesek)
-        self.NETAKFrame.layout.addWidget(self.szhC,2,1)
+        self.szhT = QLineEdit()
+        self.NETAKFrame.layout.addWidget(self.szhT,2,1)
         self.sziL = QLabel("Születési Idő")
         self.NETAKFrame.layout.addWidget(self.sziL,3,0)
         self.sziD = QDateEdit(calendarPopup=True)
