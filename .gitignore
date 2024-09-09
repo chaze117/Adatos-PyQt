@@ -2,3 +2,4 @@
 /Components/__pycache__
 *pyc
 test.py
+serviceAccountKey.json

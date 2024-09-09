@@ -38,7 +38,30 @@ class FoAdatok(QWidget):
         self.MainFrame.layout.addWidget(self.jvF,2,1)
         self.MainFrame.layout.addWidget(self.buttonsF,2,2)
         self.MainFrame.setLayout(self.MainFrame.layout)
-        
+
+        #region firebase
+        import firebase_admin
+        from firebase_admin import credentials
+        from firebase_admin import db
+        cred = credentials.Certificate('serviceAccountKey.json')
+        firebase_admin.initialize_app(cred, {'databaseURL': 'https://zomboradat-default-rtdb.europe-west1.firebasedatabase.app/'})
+        ref = db.reference('dolgozok')
+        self.data = []
+        self.x = ref.get()
+        for i in range(1,len(self.x)):
+            if self.x[i] is not None:
+                self.data.append(f"{i}. {self.x[i]['nev']} {self.x[i]['sz_ido'][0:10].replace('-','.')}")
+        self.searchCB.addItems(self.data)
+        self.searchCB.setInsertPolicy(QComboBox.NoInsert)
+        self.completer = CustomQCompleter(self.searchCB)
+        self.completer.setCompletionMode(QCompleter.PopupCompletion)
+        self.completer.setModel(self.searchCB.model())
+        self.searchCB.setCompleter(self.completer)
+        self.searchCB.currentIndexChanged.connect(self.selected)
+        #endregion
+    def selected(self,value):
+        id = self.searchCB.currentText().split('.')
+        print(self.x[int(id[0])])        
 
 class SzemelyiAdatok(QGroupBox):
     def __init__(self, parent):
@@ -352,3 +375,77 @@ class Buttons(QFrame):
         self.onk.setIconSize(QSize(40,40))
         self.onk.setToolTip("Önkéntes munka")
         self.layout.addWidget(self.onk,2,2)
+
+class CustomQCompleter(QCompleter):
+    """
+    adapted from: http://stackoverflow.com/a/7767999/2156909
+    """
+    def __init__(self, *args):#parent=None):
+        super(CustomQCompleter, self).__init__(*args)
+        self.local_completion_prefix = ""
+        self.source_model = None
+        self.filterProxyModel = QSortFilterProxyModel(self)
+        self.usingOriginalModel = False
+
+    def setModel(self, model):
+        self.source_model = model
+        self.filterProxyModel = QSortFilterProxyModel(self)
+        self.filterProxyModel.setSourceModel(self.source_model)
+        super(CustomQCompleter, self).setModel(self.filterProxyModel)
+        self.usingOriginalModel = True
+
+    def updateModel(self):
+        if not self.usingOriginalModel:
+            self.filterProxyModel.setSourceModel(self.source_model)
+
+        pattern = QRegExp(self.local_completion_prefix,
+                                Qt.CaseInsensitive,
+                                QRegExp.FixedString)
+
+        self.filterProxyModel.setFilterRegExp(pattern)
+
+    def splitPath(self, path):
+        self.local_completion_prefix = path
+        self.updateModel()
+        if self.filterProxyModel.rowCount() == 0:
+            self.usingOriginalModel = False
+            self.filterProxyModel.setSourceModel(QStringListModel([path]))
+            return [path]
+
+        return []
+
+class AutoCompleteComboBox(QComboBox):
+    def __init__(self, *args, **kwargs):
+        super(AutoCompleteComboBox, self).__init__(*args, **kwargs)
+
+        self.setEditable(True)
+        self.setInsertPolicy(self.NoInsert)
+
+        self.comp = CustomQCompleter(self)
+        self.comp.setCompletionMode(QCompleter.PopupCompletion)
+        self.setCompleter(self.comp)#
+        self.setModel(["Lola", "Lila", "Cola", 'Lothian'])
+
+    def setModel(self, strList):
+        self.clear()
+        self.insertItems(0, strList)
+        self.comp.setModel(self.model())
+
+    def focusInEvent(self, event):
+        self.clearEditText()
+        super(AutoCompleteComboBox, self).focusInEvent(event)
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        if key == 16777220:
+            # Enter (if event.key() == Qt.Key_Enter) does not work
+            # for some reason
+
+            # make sure that the completer does not set the
+            # currentText of the combobox to "" when pressing enter
+            text = self.currentText()
+            self.setCompleter(None)
+            self.setEditText(text)
+            self.setCompleter(self.comp)
+
+        return super(AutoCompleteComboBox, self).keyPressEvent(event)
