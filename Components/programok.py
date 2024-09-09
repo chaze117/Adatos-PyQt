@@ -1,0 +1,94 @@
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+import qtawesome as qta
+import re
+
+class TableModel(QAbstractTableModel):
+    def __init__(self, data):
+        super(TableModel, self).__init__()
+        self._data = data
+        self.hheaders = ["ID","Név","Születési Idő","TAJ Szám","Adóazonosító","Jogviszony kezdete", "CSJK","NÉTAK"]
+
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+           value = self._data[index.row()][index.column()]
+           if index.column() == 3:    # Betrag
+                return re.sub(r'(\d{3})(?=\d)', r'\1-', str(value)[::-1])[::-1]
+           else:
+                return value
+
+    def rowCount(self, index):
+        # The length of the outer list.
+        return len(self._data)
+
+    def columnCount(self, index):
+        # The following takes the first sub-list, and returns
+        # the length (only works if all rows are an equal length)
+        return len(self._data[0])
+    def headerData(self, section, orientation, role):           # <<<<<<<<<<<<<<< NEW DEF
+        # row and column headers
+        if role == Qt.DisplayRole:
+            if orientation == Qt.Horizontal:
+                return self.hheaders[section]
+        return QVariant()
+
+class Programok(QWidget):
+    def __init__(self, parent):
+        super(QWidget,self).__init__(parent)
+        self.progCB = QComboBox(editable=True)
+
+        self.layout = QVBoxLayout(self)
+        self.layout.addWidget(self.progCB)
+        self.table = QTableView()
+        self.layout.addWidget(self.table)
+
+        data = [
+            ["1", "Nagy Péter", "1991.08.20",   "044138370","8455211814", "2024.09.01","0","0"],
+            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
+            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
+            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
+            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
+            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
+            ]
+
+
+
+        self.model = TableModel(data)
+        self.table.setModel(self.model)
+        self.bottomFrame = QFrame()
+        self.bottomFrame.setFixedSize(110,60)
+        self.layout.addWidget(self.bottomFrame)
+        self.bottomFrame.layout = QGridLayout()
+        self.bottomFrame.setLayout(self.bottomFrame.layout)
+        # self.oLabel = QLabel("Lejár 30 napon belül")
+        # self.bottomFrame.layout.addWidget(self.oLabel,0,0)
+        # self.oSlider = QSlider(Qt.Orientation.Horizontal, self)
+        # self.oSlider.setRange(0,365)
+        # self.oSlider.setValue(30)
+        # self.oSlider.valueChanged.connect(self.update)
+        # self.oSlider.setMaximumSize(300,20)
+        # self.bottomFrame.layout.addWidget(self.oSlider,1,0)
+        # self.Grid2 = QFrame()
+        # self.Grid2.layout = QGridLayout()
+        # self.Grid2.setLayout(self.Grid2.layout)
+        # self.bottomFrame.layout.addWidget(self.Grid2,2,0)
+
+
+        self.newD = QPushButton(qta.icon('mdi6.account-arrow-down'),"")
+        self.newD.setIconSize(QSize(40,40))
+        self.newD.setToolTip("Munkaerőigény")
+        self.bottomFrame.layout.addWidget(self.newD,0,0)
+
+        self.newD2 = QPushButton(qta.icon('ei.pencil'),"")
+        self.newD2.setIconSize(QSize(40,40))
+        self.newD2.setToolTip("Átnevezés elektronikus beküldéshez")
+
+        self.bottomFrame.layout.addWidget(self.newD2,0,1)
+
+
+
+        self.setLayout(self.layout)
+    def update(self,value):
+        self.oLabel.setText(f"Lejár {value} napon belül")
