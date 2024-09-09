@@ -30,7 +30,7 @@ class FoAdatok(QWidget):
         self.jvF.setFixedSize(550,290)
         
         self.buttonsF = Buttons(self)
-        self.buttonsF.setFixedSize(220,220)
+        self.buttonsF.setFixedSize(170,170)
 
 
         self.MainFrame.layout.addWidget(self.szemadatF,1,1)
@@ -159,7 +159,7 @@ class CSJK(QFrame):
         
         self.buttonFrame = QFrame()
         self.buttonFrame.layout = QGridLayout()
-        
+        self.buttonFrame.setFixedSize(260,60)
         self.layout.addWidget(self.buttonFrame)
 
 
@@ -231,7 +231,7 @@ class NETAK(QFrame):
         
         self.buttonFrame = QFrame()
         self.buttonFrame.layout = QGridLayout()
-        
+        self.buttonFrame.setFixedSize(210,60)
         self.layout.addWidget(self.buttonFrame)
 
 
