@@ -45,6 +45,13 @@ class FoAdatok(QWidget):
         from firebase_admin import db
         cred = credentials.Certificate('serviceAccountKey.json')
         firebase_admin.initialize_app(cred, {'databaseURL': 'https://zomboradat-default-rtdb.europe-west1.firebasedatabase.app/'})
+        ref = db.reference("munkakorok")
+        self.mk = ref.get()
+        self.munkakorok= []
+        for j in range(0,len(self.mk)):
+            if self.mk[j] is not None:
+                self.munkakorok.append(f"{j}. {self.mk[j]['nev']}")
+        self.jvF.mkC.addItems(self.munkakorok)
         ref = db.reference('dolgozok')
         self.data = []
         self.x = ref.get()
@@ -52,6 +59,21 @@ class FoAdatok(QWidget):
             if self.x[i] is not None:
                 self.data.append(f"{i}. {self.x[i]['nev']} {self.x[i]['sz_ido'][0:10].replace('-','.')}")
         self.searchCB.addItems(self.data)
+        ref = db.reference("programok")
+        self.prog = ref.get()
+        self.programok = []
+        for k in range(1,len(self.prog)):
+            if self.prog[k] is not None:
+                self.programok.append(f"{k}. {self.prog[k]['r_nev']}")
+        self.jvF.progC.addItems(self.programok)
+
+        ref = db.reference("munkairanyitok")
+        self.mki = ref.get()
+        self.munkairanyitok = []
+        for k in range(1,len(self.mki)):
+            if self.mki[k] is not None:
+                self.munkairanyitok.append(f"{k}. {self.mki[k]['nev']}")
+        self.jvF.mirC.addItems(self.munkairanyitok)
         self.searchCB.setInsertPolicy(QComboBox.NoInsert)
         self.completer = CustomQCompleter(self.searchCB)
         self.completer.setCompletionMode(QCompleter.PopupCompletion)
@@ -59,9 +81,49 @@ class FoAdatok(QWidget):
         self.searchCB.setCompleter(self.completer)
         self.searchCB.currentIndexChanged.connect(self.selected)
         #endregion
+    #region FillData
     def selected(self,value):
         id = self.searchCB.currentText().split('.')
-        print(self.x[int(id[0])])        
+        self.szemadatF.nameT.setText(self.x[int(id[0])]['nev'])      
+        self.szemadatF.lnameT.setText(self.x[int(id[0])]['l_nev'])      
+        self.szemadatF.szhT.setText(self.x[int(id[0])]['sz_hely'])       
+        date = self.x[int(id[0])]['sz_ido'][0:10].split('-')
+        d = QDate(int(date[0]),int(date[1]),int(date[2]))
+        self.szemadatF.sziD.setDate(d)
+        self.szemadatF.adoT.setText(self.x[int(id[0])]['ado_sz'])
+        self.szemadatF.tajT.setText(self.x[int(id[0])]['taj_sz'])
+        self.szemadatF.cimT.setText(self.x[int(id[0])]['cim'])
+        szamlaszam = self.x[int(id[0])]['szamla_sz']
+        szamlaszam = szamlaszam.replace('-','')
+        szamlaszam = szamlaszam.replace('8x0','00000000')
+        if len(szamlaszam) == 0:
+            self.szemadatF.szamlaT.setInputMask("")
+        elif len(szamlaszam) < 17:
+            self.szemadatF.szamlaT.setInputMask("99999999-99999999")
+        else:
+            self.szemadatF.szamlaT.setInputMask("99999999-99999999-99999999")
+        self.szemadatF.szamlaT.setText(szamlaszam)
+        self.szemadatF.telT.setText(self.x[int(id[0])]['tel_sz'].replace('/','').replace('-',''))
+        self.szemadatF.szigT.setText(self.x[int(id[0])]['szigsz'])
+        self.szemadatF.tuzelo.setChecked(self.x[int(id[0])]['tuzelo'])
+        date = self.x[int(id[0])]['jog_k'][0:10].split('-')
+        d = QDate(int(date[0]),int(date[1]),int(date[2]))
+        self.jvF.jkD.setDate(d)
+        date = self.x[int(id[0])]['jog_v'][0:10].split('-')
+        d = QDate(int(date[0]),int(date[1]),int(date[2]))
+        self.jvF.jvD.setDate(d)
+        self.jvF.ugyT.setText(self.x[int(id[0])]['ugyirat'])
+        self.jvF.mkC.setCurrentIndex(int(self.x[int(id[0])]['munkakor']))
+        date = self.x[int(id[0])]['orvosi'][0:10].split('-')
+        d = QDate(int(date[0]),int(date[1]),int(date[2]))
+        self.jvF.orvosiT.setDate(d)
+        self.jvF.nettoT.setText(f"{self.mk[int(self.x[int(id[0])]['munkakor'])]["netto"]}")
+        self.jvF.progC.setCurrentIndex(int(self.x[int(id[0])]['pid'])-1)
+        self.jvF.mirC.setCurrentIndex(int(self.x[int(id[0])]['mir'])-1)
+    #endregion
+
+
+        
 
 class SzemelyiAdatok(QGroupBox):
     def __init__(self, parent):
