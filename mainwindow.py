@@ -13,8 +13,8 @@ class MainWindow(QMainWindow):
         self.setFixedSize(1165,height)
         self.setWindowIcon(QIcon('icon.ico'))
         qdarktheme.setup_theme("auto")
-        self.table_widget= tabs.Tabs(self)
-        self.setCentralWidget(self.table_widget)
+        self.tabs_widget= tabs.Tabs(self)
+        self.setCentralWidget(self.tabs_widget)
         self.setStyleSheet('font-size: 10pt; font-family: Arial;')
         self.show()
         
