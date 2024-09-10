@@ -44,18 +44,7 @@ class Orvosi(QWidget):
         self.table = QTableView()
         self.layout.addWidget(self.table)
 
-        data = [
-            ["1","Nagy Péter", "Miskolc", "1991.08.20","Sallai Erika","Kossuth utca 34.", "044138370","2025.05.30"],
-            ["2","Nagy Péter", "Miskolc", "1991.08.20","Sallai Erika","Kossuth utca 34.", "044138370","2030.05.30"],
-            ["3","Nagy Péter", "Miskolc", "1991.08.20","Sallai Erika","Kossuth utca 34.", "044138370","2020.05.30"],
-            ["4","Nagy Péter", "Miskolc", "1991.08.20","Sallai Erika","Kossuth utca 34.", "044138370","2027.05.30"],
-            ["5","Nagy Péter", "Miskolc", "1991.08.20","Sallai Erika","Kossuth utca 34.", "044138370","2022.05.30"],
-        ]
 
-
-
-        self.model = TableModel(data)
-        self.table.setModel(self.model)
         self.bottomFrame = QFrame()
         self.bottomFrame.setFixedSize(300,150)
         self.layout.addWidget(self.bottomFrame)
@@ -66,7 +55,6 @@ class Orvosi(QWidget):
         self.oSlider = QSlider(Qt.Orientation.Horizontal, self)
         self.oSlider.setRange(0,365)
         self.oSlider.setValue(30)
-        self.oSlider.valueChanged.connect(self.update)
         self.oSlider.setMaximumSize(300,20)
         self.bottomFrame.layout.addWidget(self.oSlider,1,0)
         self.Grid2 = QFrame()
@@ -89,5 +77,3 @@ class Orvosi(QWidget):
 
 
         self.setLayout(self.layout)
-    def update(self,value):
-        self.oLabel.setText(f"Lejár {value} napon belül")

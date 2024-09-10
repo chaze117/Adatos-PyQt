@@ -9,7 +9,9 @@ from firebase_admin import credentials
 from firebase_admin import db
 from typing import Any
 from dataclasses import dataclass
-from datetime import date
+import datetime
+from datetime import date, timedelta
+from Components.orvosi import TableModel as TM
 
 def IsDark():
     if darkdetect.isDark() == True:
@@ -287,6 +289,7 @@ SzemAdat = window.tabs_widget.tab1.szemadatF
 JogvAdat = window.tabs_widget.tab1.jvF
 CSJK = window.tabs_widget.tab1.adoF.tab1
 NETAK = window.tabs_widget.tab1.adoF.tab2
+orvosi = window.tabs_widget.tab2
 
 for dolgozo in Dolgozok:
       if dolgozo is not None:
@@ -297,6 +300,7 @@ for munkakor in Munkakorok:
 for program in Programok:
       if program is not None:
         JogvAdat.progC.addItem(f"{program.id}. {program.r_nev}")
+        orvosi.progCB.addItem(f"{program.id}. {program.r_nev}")
 for munkairanyito in Munkairanyitok:
       if munkairanyito is not None:
         JogvAdat.mirC.addItem(f"{munkairanyito.id}. {munkairanyito.nev}")
@@ -382,6 +386,26 @@ def SelectedNETAK(value):
 CSJK.CSJKCB.currentIndexChanged.connect(SelectedCSJK)
 NETAK.NETAKCB.currentIndexChanged.connect(SelectedNETAK)
 searchCB.currentIndexChanged.connect(SelectedDolgozo)
+#endregion
+#region orvosi
+def orvosiData(value):
+    orvosi.oLabel.setText(f"Lejár {orvosi.oSlider.value()} napon belül")
+    oData = []
+    id = orvosi.progCB.currentText().split('.')
+    id = int(id[0])
+    newtime = today + timedelta(days=orvosi.oSlider.value())
+    for dolgozo in Dolgozok:
+        if dolgozo is not None and dolgozo.pid == id:
+                y,m,d = dolgozo.orvosi[0:10].split('-')
+                dolOrv = datetime.date(int(y),int(m),int(d))
+                if dolOrv < newtime:
+                    oData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_hely,dolgozo.sz_ido[0:10],dolgozo.a_nev,dolgozo.cim,dolgozo.taj_sz.replace("-",""),dolgozo.orvosi[0:10].replace('-','.')))
+    oData.append(("","","","","","","",""))
+    model = TM(oData)
+    orvosi.table.setModel(model)
+orvosiData(1)
+orvosi.progCB.currentIndexChanged.connect(orvosiData)
+orvosi.oSlider.valueChanged.connect(orvosiData)
 #endregion
 app.exec_()
 
