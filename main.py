@@ -11,7 +11,10 @@ from typing import Any
 from dataclasses import dataclass
 import datetime
 from datetime import date, timedelta
-from Components.orvosi import TableModel as TM
+from Components.orvosi import TableModel as orvosiTM
+from Components.programok import TableModel as progTM
+from Components.tuzelo import TableModel as tuzeloTM
+from Components.munkairanyito import TableModel as mirTM
 
 def IsDark():
     if darkdetect.isDark() == True:
@@ -94,7 +97,7 @@ class Dolgozo:
 									_a_nev = obj['a_nev']
 									_ado_sz = str(obj.get("ado_sz"))
 									_cim = str(obj.get("cim"))
-									_csjk = obj.get("_csjk")
+									_csjk = obj.get("csjk")
 									_dolgozik = obj.get("dolgozik")
 									_ebed = obj.get("ebed")
 									_id = int(obj.get("id"))
@@ -290,6 +293,10 @@ JogvAdat = window.tabs_widget.tab1.jvF
 CSJK = window.tabs_widget.tab1.adoF.tab1
 NETAK = window.tabs_widget.tab1.adoF.tab2
 orvosi = window.tabs_widget.tab2
+programok = window.tabs_widget.tab3
+tuzelo = window.tabs_widget.tab4
+munkairanyitok = window.tabs_widget.tab5
+beallitasok = window.tabs_widget.tab6
 
 for dolgozo in Dolgozok:
       if dolgozo is not None:
@@ -297,13 +304,18 @@ for dolgozo in Dolgozok:
 for munkakor in Munkakorok:
        if munkakor is not None:
         JogvAdat.mkC.addItem(f"{munkakor.id}. {munkakor.nev}")
+        beallitasok.mkCb.addItem(f"{munkakor.id}. {munkakor.nev}")
 for program in Programok:
       if program is not None:
         JogvAdat.progC.addItem(f"{program.id}. {program.r_nev}")
         orvosi.progCB.addItem(f"{program.id}. {program.r_nev}")
+        programok.progCB.addItem(f"{program.id}. {program.r_nev}")
+        beallitasok.pgCb.addItem(f"{program.id}. {program.r_nev}")
 for munkairanyito in Munkairanyitok:
       if munkairanyito is not None:
         JogvAdat.mirC.addItem(f"{munkairanyito.id}. {munkairanyito.nev}")
+        munkairanyitok.munkCB.addItem(f"{munkairanyito.id}. {munkairanyito.nev}")
+        beallitasok.miCb.addItem(f"{munkairanyito.id}. {munkairanyito.nev}")
 def SelectedDolgozo(value):
     id = searchCB.currentText().split('.')
     id = int(id[0])
@@ -401,11 +413,65 @@ def orvosiData(value):
                 if dolOrv < newtime:
                     oData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_hely,dolgozo.sz_ido[0:10],dolgozo.a_nev,dolgozo.cim,dolgozo.taj_sz.replace("-",""),dolgozo.orvosi[0:10].replace('-','.')))
     oData.append(("","","","","","","",""))
-    model = TM(oData)
+    model = orvosiTM(oData)
     orvosi.table.setModel(model)
 orvosiData(1)
 orvosi.progCB.currentIndexChanged.connect(orvosiData)
 orvosi.oSlider.valueChanged.connect(orvosiData)
+
+def programData(value):
+      id = programok.progCB.currentText().split('.')
+      id = int(id[0])
+      progData = []
+      for dolgozo in Dolgozok:
+            if dolgozo is not None and dolgozo.pid == id:
+                  progData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.ado_sz,dolgozo.jog_k[0:10].replace('-','.'),dolgozo.csjk,dolgozo.netak))
+      progData.append(("","","","","","","",""))
+      model = progTM(progData)
+      programok.table.setModel(model)
+programok.progCB.currentIndexChanged.connect(programData)
+programData(1)
+tuzeloData = []
+for dolgozo in Dolgozok:
+    if dolgozo is not None and dolgozo.tuzelo == True:
+            cim = dolgozo.cim.split(" ")
+            hsz = cim[len(cim)-1].replace('.','')
+            tuzeloData.append((dolgozo.id,dolgozo.nev,cim[0],hsz))
+tuzeloData = sorted(tuzeloData, key = lambda x: (x[2], int(x[3])))
+model = tuzeloTM(tuzeloData)
+tuzelo.table.setModel(model)
+def munkairanyitoData(value):
+    id = munkairanyitok.munkCB.currentText().split('.')
+    id = int(id[0])
+    munkairData = []
+    for dolgozo in Dolgozok:
+          if dolgozo is not None and dolgozo.mir == id:
+                munkairData.append((dolgozo.id, dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.jog_v[0:10].replace('-','.')))
+    model = mirTM(munkairData)
+    munkairanyitok.table.setModel(model)
+munkairanyitok.munkCB.currentIndexChanged.connect(munkairanyitoData)
+munkairanyitoData(1)
+def setmk(value):
+      id = beallitasok.mkCb.currentText().split(".")
+      id = int(id[0])
+      beallitasok.mknameT.setText(Munkakorok[id].nev)
+      beallitasok.mkbrutT.setText(str(Munkakorok[id].brutto))
+      beallitasok.mknetT.setText(str(Munkakorok[id].netto))
+beallitasok.mkCb.currentIndexChanged.connect(setmk)
+
+def setmi(value):
+      id = beallitasok.miCb.currentText().split('.')
+      id = int(id[0])
+      beallitasok.minameT.setText(Munkairanyitok[id].nev)
+beallitasok.miCb.currentIndexChanged.connect(setmi)
+
+def setprog(value):
+    id = beallitasok.pgCb.currentText().split('.')
+    id = int(id[0])
+    beallitasok.pghnevT.setText(Programok[id].h_nev)
+    beallitasok.pgrnevT.setText(Programok[id].r_nev)
+    beallitasok.pghatT.setText(Programok[id].hatosagi)
+beallitasok.pgCb.currentIndexChanged.connect(setprog)
 #endregion
 app.exec_()
 

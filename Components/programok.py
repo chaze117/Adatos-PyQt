@@ -43,20 +43,6 @@ class Programok(QWidget):
         self.layout.addWidget(self.progCB)
         self.table = QTableView()
         self.layout.addWidget(self.table)
-
-        data = [
-            ["1", "Nagy Péter", "1991.08.20",   "044138370","8455211814", "2024.09.01","0","0"],
-            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
-            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
-            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
-            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
-            ["2","Nagy Péter",  "1991.08.20","044138370","8455211814", "2024.09.01","0","0"],
-            ]
-
-
-
-        self.model = TableModel(data)
-        self.table.setModel(self.model)
         
         self.bottomFrame = QFrame()
         self.bottomFrame.setFixedSize(110,65)

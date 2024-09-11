@@ -19,6 +19,7 @@ class TableModel(QAbstractTableModel):
 
     def columnCount(self, index):
         return len(self._data[0])
+    
     def headerData(self, section, orientation, role):           # <<<<<<<<<<<<<<< NEW DEF
         # row and column headers
         if role == Qt.DisplayRole:
@@ -33,21 +34,7 @@ class Tuzelo(QWidget):
         self.table = QTableView()
         self.layout.addWidget(self.table)
 
-        data = [
-            [2,"Nagy Péter", "Kossuth", 20],
-            [5,"Nagy Péter", "Árpád", 55],
-            [1,"Nagy Péter", "Kossuth", 5],
-            [3,"Nagy Péter", "Rákóczi", 11],
-            [6,"Nagy Péter", "Béke", 2],
-            [7,"Nagy Péter", "Kossuth", 34],
-            [4,"Nagy Péter", "Lehel", 20],
-        ]
 
-
-
-        self.table.setSortingEnabled(True)
-        self.model = TableModel(data)
-        self.table.setModel(self.model)
         self.BF = QFrame()
         self.layout.addWidget(self.BF)
         self.BF.setFixedSize(110,65)
