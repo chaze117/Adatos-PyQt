@@ -79,8 +79,9 @@ class Munkairanyito(QWidget):
 
         
 
-        self.newD = QPushButton(qta.icon('fa5s.book-open'),"")
-        self.newD.setIconSize(QSize(40,40))
-        self.newD.setToolTip("Jelenléti nyomtatása")
-        self.bottomFrame.layout.addWidget(self.newD,0,0)
+        self.jelenleti = QPushButton(qta.icon('fa5s.book-open'),"")
+        self.jelenleti.setIconSize(QSize(40,40))
+        self.jelenleti.setFixedSize(50,50)
+        self.jelenleti.setToolTip("Jelenléti nyomtatása")
+        self.bottomFrame.layout.addWidget(self.jelenleti,0,0)
         self.setLayout(self.layout)

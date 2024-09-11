@@ -61,18 +61,19 @@ class Orvosi(QWidget):
         self.Grid2.layout = QGridLayout()
         self.Grid2.setLayout(self.Grid2.layout)
         self.bottomFrame.layout.addWidget(self.Grid2,2,0)
-        self.Grid2.setFixedSize(105,65)
+        self.Grid2.setFixedSize(110,65)
 
-        self.newD = QPushButton(qta.icon('mdi.format-list-bulleted'),"")
-        self.newD.setIconSize(QSize(40,40))
-        self.newD.setToolTip("Lista nyomtatása")
-        self.Grid2.layout.addWidget(self.newD,0,0)
+        self.printList = QPushButton(qta.icon('mdi.format-list-bulleted'),"")
+        self.printList.setIconSize(QSize(40,40))
+        self.printList.setFixedSize(50,50)
+        self.printList.setToolTip("Lista nyomtatása")
+        self.Grid2.layout.addWidget(self.printList,0,0)
 
-        self.newD2 = QPushButton(qta.icon('fa.print'),"")
-        self.newD2.setIconSize(QSize(40,40))
-        self.newD2.setToolTip("Alkalmasságik nyomtatása")
-
-        self.Grid2.layout.addWidget(self.newD2,0,1)
+        self.print = QPushButton(qta.icon('fa.print'),"")
+        self.print.setIconSize(QSize(40,40))
+        self.print.setToolTip("Alkalmasságik nyomtatása")
+        self.print.setFixedSize(50,50)
+        self.Grid2.layout.addWidget(self.print,0,1)
 
 
 

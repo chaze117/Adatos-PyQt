@@ -37,17 +37,18 @@ class Tuzelo(QWidget):
 
         self.BF = QFrame()
         self.layout.addWidget(self.BF)
-        self.BF.setFixedSize(110,65)
+        self.BF.setFixedSize(115,65)
         self.BF.layout = QGridLayout()
         self.BF.setLayout(self.BF.layout)
 
-        self.newD = QPushButton(qta.icon('fa.refresh'),"")
-        self.newD.setIconSize(QSize(40,40))
-        self.newD.setToolTip("Lista frissítése")
-        self.BF.layout.addWidget(self.newD,0,0)
+        self.refresh = QPushButton(qta.icon('fa.refresh'),"")
+        self.refresh.setIconSize(QSize(40,40))
+        self.refresh.setFixedSize(50,50)
+        self.refresh.setToolTip("Lista frissítése")
+        self.BF.layout.addWidget(self.refresh,0,0)
 
-        self.newD2 = QPushButton(qta.icon('fa.print'),"")
-        self.newD2.setIconSize(QSize(40,40))
-        self.newD2.setToolTip("Lista nyomtatása")
-
-        self.BF.layout.addWidget(self.newD2,0,1)
+        self.print = QPushButton(qta.icon('fa.print'),"")
+        self.print.setIconSize(QSize(40,40))
+        self.print.setToolTip("Lista nyomtatása")
+        self.print.setFixedSize(50,50)
+        self.BF.layout.addWidget(self.print,0,1)

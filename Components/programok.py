@@ -45,23 +45,24 @@ class Programok(QWidget):
         self.layout.addWidget(self.table)
         
         self.bottomFrame = QFrame()
-        self.bottomFrame.setFixedSize(110,65)
+        self.bottomFrame.setFixedSize(115,65)
         self.layout.addWidget(self.bottomFrame)
         self.bottomFrame.layout = QGridLayout()
         self.bottomFrame.setLayout(self.bottomFrame.layout)
 
 
 
-        self.newD = QPushButton(qta.icon('mdi6.account-arrow-down'),"")
-        self.newD.setIconSize(QSize(40,40))
-        self.newD.setToolTip("Munkaerőigény")
-        self.bottomFrame.layout.addWidget(self.newD,0,0)
+        self.mkigeny = QPushButton(qta.icon('mdi6.account-arrow-down'),"")
+        self.mkigeny.setIconSize(QSize(40,40))
+        self.mkigeny.setFixedSize(50,50)
+        self.mkigeny.setToolTip("Munkaerőigény")
+        self.bottomFrame.layout.addWidget(self.mkigeny,0,0)
 
-        self.newD2 = QPushButton(qta.icon('ei.pencil'),"")
-        self.newD2.setIconSize(QSize(40,40))
-        self.newD2.setToolTip("Átnevezés elektronikus beküldéshez")
-
-        self.bottomFrame.layout.addWidget(self.newD2,0,1)
+        self.rename = QPushButton(qta.icon('ei.pencil'),"")
+        self.rename.setIconSize(QSize(40,40))
+        self.rename.setToolTip("Átnevezés elektronikus beküldéshez")
+        self.rename.setFixedSize(50,50)
+        self.bottomFrame.layout.addWidget(self.rename,0,1)
 
 
 
