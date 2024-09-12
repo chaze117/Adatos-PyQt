@@ -27,8 +27,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.tabs_widget)
         self.setStyleSheet('font-size: 10pt; font-family: Arial;')
         self.show()
-        self.szemButtons = self.tabs_widget.tab1.buttonsF
-        self.szemButtons.newD.clicked.connect(self.newDolgozo)
+        self.tabs_widget.tab1.buttonsF.newD.clicked.connect(self.newDolgozo)
+        self.tabs_widget.tab6.mknew.clicked.connect(self.newMunkakor)
+        self.tabs_widget.tab6.mkedit.clicked.connect(lambda: F.modMunkakor(self))
+        self.tabs_widget.tab6.mkdel.clicked.connect(lambda: F.delMunkakor(self))
 
         self.Dolgozok = FB.getDolgozok()
         self.Gyerekek = FB.getGyerekek()
@@ -67,6 +69,10 @@ class MainWindow(QMainWindow):
     def newDolgozo(self):
             self.dialog = NewDolgozo(parent=self)
             self.dialog.show()
+    
+    def newMunkakor(self):
+         self.dialog = NewMunkakor(parent=self)
+         self.dialog.show()
 
       
 
@@ -141,7 +147,7 @@ class NewDolgozo(QMainWindow):
     
     def closeEvent(self, event):
             self.parent().Dolgozok = FB.getDolgozok()
-            F.fillSearchCB(self.parent().Dolgozok, self.parent().tabs_widget.tab1.searchCB)
+            F.fillSearchCB(self.parent())
             event.accept()
 
     def saveClicked(self):
@@ -178,8 +184,66 @@ class NewDolgozo(QMainWindow):
         ref.child(str(dolgozo.id)).set(d)
         self.close()
 
-        
+class NewMunkakor(QMainWindow):
+    def __init__(self, *args,parent=None, **kwargs):
+        super(NewMunkakor,self).__init__(*args,parent,**kwargs)
+        self.setWindowTitle("Új Munkakör")
+        self.setWindowIcon(QIcon('icon.ico'))
+        self.setFixedSize(380,175)
+
+        self.MainFrame = QFrame()
+        self.MainFrame.setStyleSheet('font: bold 10pt; font-family: Arial;')
+        self.setCentralWidget(self.MainFrame)
+        self.MainFrame.layout = QVBoxLayout()
+        self.MainFrame.setLayout(self.MainFrame.layout)
+
+        self.mkGrid = QFrame()
+        self.mkGrid.layout = QGridLayout()
+        self.mkGrid.setLayout(self.mkGrid.layout)
+        self.mkGrid.setFixedSize(360,150)
+        self.MainFrame.layout.addWidget(self.mkGrid)
+
+        self.mknameL = QLabel("Megnevezés:")
+        self.mkGrid.layout.addWidget(self.mknameL,0,0)
+        self.mknameT = QLineEdit()
+        self.mkGrid.layout.addWidget(self.mknameT,0,1)
+
+        self.mknetL = QLabel("Nettó:")
+        self.mkGrid.layout.addWidget(self.mknetL,1,0)
+        self.mknetT = QLineEdit()
+        self.mkGrid.layout.addWidget(self.mknetT,1,1)
+
+        self.mkbrutL = QLabel("Bruttó:")
+        self.mkGrid.layout.addWidget(self.mkbrutL,2,0)
+        self.mkbrutT = QLineEdit()
+        self.mkGrid.layout.addWidget(self.mkbrutT,2,1)
 
 
-        
+        self.mknew = QPushButton(qta.icon('fa.floppy-o'),"")
+        self.mknew.setIconSize(QSize(40,40))
+        self.mknew.setFixedSize(50,50)
+        self.mknew.setToolTip("Új munkakör")
+        self.mkGrid.layout.addWidget(self.mknew,3,0)
+        self.mknew.clicked.connect(self.saveClicked)
+
+    def closeEvent(self,event):
+        self.parent().Munkakorok = FB.getMunkakorok()
+        F.fillMunkakorCB(self.parent())
+        event.accept()
+
+    def saveClicked(self):
+        ref = db.reference("munkakorok")
+        _temp = ref.get()
+        Munkakorok = []
+        for i in range(0,len(_temp)):
+            Munkakorok.append(Munkakor.from_dict(_temp[i]))
+        nextID = int(Munkakorok[len(Munkakorok)-1].id)+1
+        munkakor = Munkakor(
+             nextID,
+             self.mknameT.text(),
+             self.mkbrutT.text(),
+             self.mknetT.text())
+        m = json.loads(munkakor.toJSON())
+        ref.child(str(munkakor.id)).set(m)
+        self.close()
         

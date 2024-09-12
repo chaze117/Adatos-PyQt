@@ -8,6 +8,10 @@ from Components.programok import TableModel as progTM
 from Components.tuzelo import TableModel as tuzeloTM
 from Components.munkairanyito import TableModel as mirTM
 import Components.firebase as FB
+from Components.classes import *
+from firebase_admin import credentials
+from firebase_admin import db
+from Components.classes import *
 
 def SelectedDolgozo(window:any):
     SzemAdat = window.tabs_widget.tab1.szemadatF
@@ -105,6 +109,8 @@ def fillSearchCB(window:any):
             window.tabs_widget.tab1.searchCB.addItem(f"{dolgozo.id}. {dolgozo.nev} - {dolgozo.sz_ido[0:10].replace('-','.')}")
 
 def fillMunkakorCB(window:any):
+     window.tabs_widget.tab1.jvF.mkC.clear()
+     window.tabs_widget.tab6.mkCb.clear()
      for munkakor in window.Munkakorok:
        if munkakor is not None:
         window.tabs_widget.tab1.jvF.mkC.addItem(f"{munkakor.id}. {munkakor.nev}")
@@ -178,21 +184,47 @@ def FillMunkairanyitoData(window:any):
     window.tabs_widget.tab5.table.setModel(model)
 
 def settingsMunkakorok(window:any):
-    id = window.tabs_widget.tab6.mkCb.currentText().split(".")
-    id = int(id[0])
-    window.tabs_widget.tab6.mknameT.setText(window.Munkakorok[id].nev)
-    window.tabs_widget.tab6.mkbrutT.setText(str(window.Munkakorok[id].brutto))
-    window.tabs_widget.tab6.mknetT.setText(str(window.Munkakorok[id].netto))
+    if window.tabs_widget.tab6.mkCb.currentText() != '':
+        id = window.tabs_widget.tab6.mkCb.currentText().split(".")
+        id = int(id[0])
+        window.tabs_widget.tab6.mknameT.setText(window.Munkakorok[id].nev)
+        window.tabs_widget.tab6.mkbrutT.setText(str(window.Munkakorok[id].brutto))
+        window.tabs_widget.tab6.mknetT.setText(str(window.Munkakorok[id].netto))
+
+def modMunkakor(window:any):
+     if window.tabs_widget.tab6.mkCb.currentText() != '':
+        id = window.tabs_widget.tab6.mkCb.currentText().split(".")
+        id = int(id[0])
+        munkakor = Munkakor(
+            id,
+            window.tabs_widget.tab6.mknameT.text(),
+            window.tabs_widget.tab6.mkbrutT.text(),
+            window.tabs_widget.tab6.mknetT.text())
+        ref = db.reference("munkakorok")
+        d = json.loads(munkakor.toJSON())
+        ref.child(str(munkakor.id)).set(d)
+        window.Munkakorok = FB.getMunkakorok()
+        fillMunkakorCB(window)
+
+def delMunkakor(window:any):
+    if window.tabs_widget.tab6.mkCb.currentText() != '':
+        id = window.tabs_widget.tab6.mkCb.currentText().split(".")
+        ref = db.reference("munkakorok")
+        ref.child(id[0]).set({})
+        window.Munkakorok = FB.getMunkakorok()
+        fillMunkakorCB(window)
 
 def settingsMunkairanyitok(window:any):
-    id = window.tabs_widget.tab6.miCb.currentText().split('.')
-    id = int(id[0])
-    window.tabs_widget.tab6.minameT.setText(window.Munkairanyitok[id].nev)
+    if window.tabs_widget.tab6.miCb.currentText() != '':
+        id = window.tabs_widget.tab6.miCb.currentText().split('.')
+        id = int(id[0])
+        window.tabs_widget.tab6.minameT.setText(window.Munkairanyitok[id].nev)
 
 
 def settingsProgramok(window:any):
-    id = window.tabs_widget.tab6.pgCb.currentText().split('.')
-    id = int(id[0])
-    window.tabs_widget.tab6.pghnevT.setText(window.Programok[id].h_nev)
-    window.tabs_widget.tab6.pgrnevT.setText(window.Programok[id].r_nev)
-    window.tabs_widget.tab6.pghatT.setText(window.Programok[id].hatosagi)
+    if window.tabs_widget.tab6.pgCb.currentText() != "":
+        id = window.tabs_widget.tab6.pgCb.currentText().split('.')
+        id = int(id[0])
+        window.tabs_widget.tab6.pghnevT.setText(window.Programok[id].h_nev)
+        window.tabs_widget.tab6.pgrnevT.setText(window.Programok[id].r_nev)
+        window.tabs_widget.tab6.pghatT.setText(window.Programok[id].hatosagi)

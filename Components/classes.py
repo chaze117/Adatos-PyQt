@@ -165,6 +165,12 @@ class Munkakor:
         brutto:int
         netto:int
 
+        def toJSON(self):
+            return json.dumps(
+                self,
+                default=lambda o: o.__dict__, 
+                sort_keys=True,
+                indent=4)
         @staticmethod
         def from_dict(obj:Any) -> 'Munkakor':
                 if obj is not None:
