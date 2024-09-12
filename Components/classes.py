@@ -48,29 +48,23 @@ class Dolgozo:
     a_nev: str
     ado_sz: str
     cim: str
-    csjk: bool
-    dolgozik: bool
-    ebed: bool
     id: int
     jog_k: str
     jog_v: str
     l_nev: str
     mir: int
     munkakor: int
-    netak: bool
     nev: str
     orvosi: str
     pid: int
     sz_hely: str
     sz_ido: str
-    szabi: float
     szamla_sz: str
     szigsz: str
     taj_sz: str
     tel_sz: str
     tuzelo: bool
     ugyirat: str
-    ures: bool
     
     def toJSON(self):
         return json.dumps(
@@ -78,36 +72,31 @@ class Dolgozo:
             default=lambda o: o.__dict__, 
             sort_keys=True,
             indent=4)
+    
     @staticmethod
     def from_dict(obj: Any) -> 'Dolgozo':
 					if obj is not None:
 									_a_nev = obj['a_nev']
 									_ado_sz = str(obj.get("ado_sz"))
 									_cim = str(obj.get("cim"))
-									_csjk = obj.get("csjk")
-									_dolgozik = obj.get("dolgozik")
-									_ebed = obj.get("ebed")
 									_id = int(obj.get("id"))
 									_jog_k = str(obj.get("jog_k"))
 									_jog_v = str(obj.get("jog_v"))
 									_l_nev = str(obj.get("l_nev"))
 									_mir = int(obj.get("mir"))
 									_munkakor = int(obj.get("munkakor"))
-									_netak = obj.get("netak")
 									_nev = str(obj.get("nev"))
 									_orvosi = str(obj.get("orvosi"))
 									_pid = int(obj.get("pid"))
 									_sz_hely = str(obj.get("sz_hely"))
 									_sz_ido = str(obj.get("sz_ido"))
-									_szabi = float(obj.get("szabi"))
 									_szamla_sz = str(obj.get("szamla_sz"))
 									_szigsz = str(obj.get("szigsz"))
 									_taj_sz = str(obj.get("taj_sz"))
 									_tel_sz = str(obj.get("tel_sz"))
 									_tuzelo = obj.get("tuzelo")
 									_ugyirat = str(obj.get("ugyirat"))
-									_ures = obj.get("ures")
-									return Dolgozo(_a_nev, _ado_sz, _cim, _csjk, _dolgozik, _ebed, _id, _jog_k, _jog_v, _l_nev, _mir, _munkakor, _netak, _nev, _orvosi, _pid, _sz_hely, _sz_ido, _szabi, _szamla_sz, _szigsz, _taj_sz, _tel_sz, _tuzelo, _ugyirat, _ures)
+									return Dolgozo(_a_nev, _ado_sz, _cim,  _id, _jog_k, _jog_v, _l_nev, _mir, _munkakor,  _nev, _orvosi, _pid, _sz_hely, _sz_ido,  _szamla_sz, _szigsz, _taj_sz, _tel_sz, _tuzelo, _ugyirat)
 
 @dataclass
 class Gyerek:

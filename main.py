@@ -25,14 +25,14 @@ app = QApplication(sys.argv+ ['-platform', f'windows:darkmode={IsDark()}'])
 window = windowses.MainWindow()
 
 cred = credentials.Certificate('serviceAccountKey.json')
-firebase_admin.initialize_app(cred, {'databaseURL': 'https://zomboradat-default-rtdb.europe-west1.firebasedatabase.app/'})
+firebase_admin.initialize_app(cred, {'databaseURL': 'https://zomboradat-default-rtdb.europe-west1.firebasedatabase.app/'},"sec")
 
 #region get data
-ref = db.reference('dolgozok')
-_temp = ref.get()
-Dolgozok = []
-for i in range(0,len(_temp)):
-    Dolgozok.append(Dolgozo.from_dict(_temp[i]))
+# ref = db.reference('dolgozok')
+# _temp = ref.get()
+# Dolgozok = []
+# for i in range(0,len(_temp)):
+#     Dolgozok.append(Dolgozo.from_dict(_temp[i]))
 
 
 ref = db.reference('gyerek')
@@ -93,9 +93,9 @@ tuzelo = window.tabs_widget.tab4
 munkairanyitok = window.tabs_widget.tab5
 beallitasok = window.tabs_widget.tab6
 
-for dolgozo in Dolgozok:
-      if dolgozo is not None:
-        searchCB.addItem(f"{dolgozo.id}. {dolgozo.nev} - {dolgozo.sz_ido[0:10].replace('-','.')}")
+# for dolgozo in Dolgozok:
+#       if dolgozo is not None:
+#         searchCB.addItem(f"{dolgozo.id}. {dolgozo.nev} - {dolgozo.sz_ido[0:10].replace('-','.')}")
 for munkakor in Munkakorok:
        if munkakor is not None:
         JogvAdat.mkC.addItem(f"{munkakor.id}. {munkakor.nev}")
@@ -112,61 +112,63 @@ for munkairanyito in Munkairanyitok:
         munkairanyitok.munkCB.addItem(f"{munkairanyito.id}. {munkairanyito.nev}")
         beallitasok.miCb.addItem(f"{munkairanyito.id}. {munkairanyito.nev}")
 def SelectedDolgozo(value):
-    id = searchCB.currentText().split('.')
-    id = int(id[0])
-    
-    SzemAdat.nameT.setText(Dolgozok[id].nev)
-    SzemAdat.lnameT.setText(Dolgozok[id].l_nev)
-    SzemAdat.anameT.setText(Dolgozok[id].a_nev)
-    SzemAdat.szhT.setText(Dolgozok[id].sz_hely)
-    y,m,d = Dolgozok[id].sz_ido[0:10].split('-')
-    SzemAdat.sziD.setDate(QDate(int(y),int(m),int(d)))
-    SzemAdat.adoT.setText(Dolgozok[id].ado_sz)
-    SzemAdat.tajT.setText(Dolgozok[id].taj_sz)
-    SzemAdat.cimT.setText(Dolgozok[id].cim)
-    szamla = Dolgozok[id].szamla_sz.replace('-','').replace('8x0','00000000')
-    if len(szamla) == 0:
-            SzemAdat.szamlaT.setInputMask("")
-    elif len(szamla) < 17:
-        SzemAdat.szamlaT.setInputMask("99999999-99999999")
-    else:
-        SzemAdat.szamlaT.setInputMask("99999999-99999999-99999999")
-    SzemAdat.szamlaT.setText(szamla)
-    telefon = Dolgozok[id].tel_sz.replace("-","").replace("/","")
-    SzemAdat.telT.setText(telefon)
-    SzemAdat.szigT.setText(Dolgozok[id].szigsz)
-    SzemAdat.tuzelo.setChecked(Dolgozok[id].tuzelo)
-    y,m,d = Dolgozok[id].jog_k[0:10].split('-')
-    JogvAdat.jkD.setDate(QDate(int(y),int(m),int(d)))
-    y,m,d = Dolgozok[id].jog_v[0:10].split('-')
-    JogvAdat.jvD.setDate(QDate(int(y),int(m),int(d)))
-    JogvAdat.mkC.setCurrentIndex(Dolgozok[id].munkakor)
-    JogvAdat.nettoT.setText(str(Munkakorok[Dolgozok[id].munkakor].netto))
-    JogvAdat.progC.setCurrentIndex(Dolgozok[id].pid-1)
-    JogvAdat.mirC.setCurrentIndex(Dolgozok[id].mir-1)
-    JogvAdat.ugyT.setText(Dolgozok[id].ugyirat)
-    y,m,d = Dolgozok[id].orvosi[0:10].split('-')
-    JogvAdat.orvosiT.setDate(QDate(int(y),int(m),int(d)))
-    CSJK.CSJKCB.clear()
-    CSJK.nameT.clear()
-    CSJK.anevT.clear()
-    CSJK.szhT.clear()
-    CSJK.sziD.setDate(today)
-    CSJK.adoT.clear()
-    CSJK.tajT.clear()
-    CSJK.cimT.clear()
-    for gyerek in Gyerekek:
-          if gyerek is not None and int(gyerek.sz_id) == id:
-                CSJK.CSJKCB.addItem(f"{gyerek.id}. {gyerek.nev} - {gyerek.sz_ido[0:10].replace('-','.')}")
-    NETAK.NETAKCB.clear()
-    NETAK.nameT.clear()
-    NETAK.anevT.clear()
-    NETAK.szhT.clear()
-    NETAK.sziD.setDate(today)
-    NETAK.adoT.clear()
-    for gyerek in Gyerekek_n:
-          if gyerek is not None and int(gyerek.sz_id) == id:
-                NETAK.NETAKCB.addItem(f"{gyerek.id}. {gyerek.nev} - {gyerek.sz_ido[0:10].replace('-','.')}") 
+    if searchCB.currentText() != '':
+        id = searchCB.currentText().split('.')
+        print(searchCB.currentText())
+        id = int(id[0])
+        
+        SzemAdat.nameT.setText(window.Dolgozok[id].nev)
+        SzemAdat.lnameT.setText(window.Dolgozok[id].l_nev)
+        SzemAdat.anameT.setText(window.Dolgozok[id].a_nev)
+        SzemAdat.szhT.setText(window.Dolgozok[id].sz_hely)
+        y,m,d = window.Dolgozok[id].sz_ido[0:10].split('-')
+        SzemAdat.sziD.setDate(QDate(int(y),int(m),int(d)))
+        SzemAdat.adoT.setText(window.Dolgozok[id].ado_sz)
+        SzemAdat.tajT.setText(window.Dolgozok[id].taj_sz)
+        SzemAdat.cimT.setText(window.Dolgozok[id].cim)
+        szamla = window.Dolgozok[id].szamla_sz.replace('-','').replace('8x0','00000000')
+        if len(szamla) == 0:
+                SzemAdat.szamlaT.setInputMask("")
+        elif len(szamla) < 17:
+            SzemAdat.szamlaT.setInputMask("99999999-99999999")
+        else:
+            SzemAdat.szamlaT.setInputMask("99999999-99999999-99999999")
+        SzemAdat.szamlaT.setText(szamla)
+        telefon = window.Dolgozok[id].tel_sz.replace("-","").replace("/","")
+        SzemAdat.telT.setText(telefon)
+        SzemAdat.szigT.setText(window.Dolgozok[id].szigsz)
+        SzemAdat.tuzelo.setChecked(window.Dolgozok[id].tuzelo)
+        y,m,d = window.Dolgozok[id].jog_k[0:10].split('-')
+        JogvAdat.jkD.setDate(QDate(int(y),int(m),int(d)))
+        y,m,d = window.Dolgozok[id].jog_v[0:10].split('-')
+        JogvAdat.jvD.setDate(QDate(int(y),int(m),int(d)))
+        JogvAdat.mkC.setCurrentIndex(window.Dolgozok[id].munkakor)
+        JogvAdat.nettoT.setText(str(Munkakorok[window.Dolgozok[id].munkakor].netto))
+        JogvAdat.progC.setCurrentIndex(window.Dolgozok[id].pid-1)
+        JogvAdat.mirC.setCurrentIndex(window.Dolgozok[id].mir-1)
+        JogvAdat.ugyT.setText(window.Dolgozok[id].ugyirat)
+        y,m,d = window.Dolgozok[id].orvosi[0:10].split('-')
+        JogvAdat.orvosiT.setDate(QDate(int(y),int(m),int(d)))
+        CSJK.CSJKCB.clear()
+        CSJK.nameT.clear()
+        CSJK.anevT.clear()
+        CSJK.szhT.clear()
+        CSJK.sziD.setDate(today)
+        CSJK.adoT.clear()
+        CSJK.tajT.clear()
+        CSJK.cimT.clear()
+        for gyerek in Gyerekek:
+            if gyerek is not None and int(gyerek.sz_id) == id:
+                    CSJK.CSJKCB.addItem(f"{gyerek.id}. {gyerek.nev} - {gyerek.sz_ido[0:10].replace('-','.')}")
+        NETAK.NETAKCB.clear()
+        NETAK.nameT.clear()
+        NETAK.anevT.clear()
+        NETAK.szhT.clear()
+        NETAK.sziD.setDate(today)
+        NETAK.adoT.clear()
+        for gyerek in Gyerekek_n:
+            if gyerek is not None and int(gyerek.sz_id) == id:
+                    NETAK.NETAKCB.addItem(f"{gyerek.id}. {gyerek.nev} - {gyerek.sz_ido[0:10].replace('-','.')}") 
          
 def SelectedCSJK(value):
     if value > -1:
@@ -202,7 +204,7 @@ def orvosiData(value):
     id = orvosi.progCB.currentText().split('.')
     id = int(id[0])
     newtime = today + timedelta(days=orvosi.oSlider.value())
-    for dolgozo in Dolgozok:
+    for dolgozo in window.Dolgozok:
         if dolgozo is not None and dolgozo.pid == id:
                 y,m,d = dolgozo.orvosi[0:10].split('-')
                 dolOrv = datetime.date(int(y),int(m),int(d))
@@ -219,16 +221,16 @@ def programData(value):
       id = programok.progCB.currentText().split('.')
       id = int(id[0])
       progData = []
-      for dolgozo in Dolgozok:
+      for dolgozo in window.Dolgozok:
             if dolgozo is not None and dolgozo.pid == id:
-                  progData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.ado_sz,dolgozo.jog_k[0:10].replace('-','.'),dolgozo.csjk,dolgozo.netak))
+                  progData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.ado_sz,dolgozo.jog_k[0:10].replace('-','.')))
       progData.append(("","","","","","","",""))
       model = progTM(progData)
       programok.table.setModel(model)
 programok.progCB.currentIndexChanged.connect(programData)
 programData(1)
 tuzeloData = []
-for dolgozo in Dolgozok:
+for dolgozo in window.Dolgozok:
     if dolgozo is not None and dolgozo.tuzelo == True:
             cim = dolgozo.cim.split(" ")
             hsz = cim[len(cim)-1].replace('.','')
@@ -240,7 +242,7 @@ def munkairanyitoData(value):
     id = munkairanyitok.munkCB.currentText().split('.')
     id = int(id[0])
     munkairData = []
-    for dolgozo in Dolgozok:
+    for dolgozo in window.Dolgozok:
           if dolgozo is not None and dolgozo.mir == id:
                 munkairData.append((dolgozo.id, dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.jog_v[0:10].replace('-','.')))
     munkairData.append(("","","","",""))

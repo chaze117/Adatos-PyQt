@@ -8,10 +8,12 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 from Components.classes import *
-import json
+from datetime import date
+import Components.firebase as FB
 
 
 class MainWindow(QMainWindow):
+
     def __init__(self, *args, **kwargs):
         super(MainWindow,self).__init__(*args,**kwargs)
         self.setWindowTitle("Adatkezelő Alaklmazás")
@@ -26,15 +28,20 @@ class MainWindow(QMainWindow):
         self.show()
         self.szemButtons = self.tabs_widget.tab1.buttonsF
         self.szemButtons.newD.clicked.connect(self.newDolgozo)
+        self.Dolgozok = []
+        self.Dolgozok = FB.getDolgozok()
+        FB.fillSearchCB(self.Dolgozok, self.tabs_widget.tab1.searchCB)
 
+        
     def newDolgozo(self):
-            self.dialog = NewDolgozo()
+            self.dialog = NewDolgozo(parent=self)
             self.dialog.show()
+
       
 
 class NewDolgozo(QMainWindow):
-    def __init__(self, *args, **kwargs):
-        super(NewDolgozo,self).__init__(*args,**kwargs)
+    def __init__(self, *args,parent=None, **kwargs):
+        super(NewDolgozo,self).__init__(*args,parent,**kwargs)
         self.setWindowTitle("Új dolgozó")
         self.setWindowIcon(QIcon('icon.ico'))
         self.setFixedSize(500,500)
@@ -101,18 +108,46 @@ class NewDolgozo(QMainWindow):
         self.MainFrame.layout.addWidget(self.newD,11,0)
         self.MainFrame.setLayout(self.MainFrame.layout)
     
+    def closeEvent(self, event):
+            self.parent().Dolgozok = FB.getDolgozok()
+            FB.fillSearchCB(self.parent().Dolgozok, self.parent().tabs_widget.tab1.searchCB)
+            event.accept()
+
     def saveClicked(self):
+        today = date.today()
         ref = db.reference('dolgozok')
         _temp = ref.get()
         Dolgozok = []
         for i in range(0,len(_temp)):
             Dolgozok.append(Dolgozo.from_dict(_temp[i]))
         nextID = int(Dolgozok[len(Dolgozok)-1].id)+1
-        dolgozo = Dolgozo(self.anameT.text(),"","",False,False,False,nextID,"","","",1,1,False,"","",1,"","",0,"","","","",False,"",False)
+        dolgozo = Dolgozo(
+            self.anameT.text(),
+            self.adoT.text(),
+            self.cimT.text(),
+            nextID,
+            str(today),
+            str(today),
+            self.lnameT.text(),
+            1,
+            0,
+            self.nameT.text(),
+            str(today),
+            1,
+            self.szhT.text(),
+            self.sziD.date().toString("yyyy-MM-dd"),
+            self.szamlaT.text().replace('-',''),
+            self.szigT.text(),
+            self.tajT.text().replace('-',''),
+            self.telT.text().replace("+36","").replace("-","").replace("/",""),
+            self.tuzelo.isChecked(),
+            "")
         ref = db.reference(f"dolgozok/")
         d = json.loads(dolgozo.toJSON())
         ref.child(str(dolgozo.id)).set(d)
         self.close()
+
+        
 
 
         

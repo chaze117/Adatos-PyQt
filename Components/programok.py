@@ -8,7 +8,7 @@ class TableModel(QAbstractTableModel):
     def __init__(self, data):
         super(TableModel, self).__init__()
         self._data = data
-        self.hheaders = ["ID","Név","Születési Idő","TAJ Szám","Adóazonosító","Jogviszony kezdete", "CSJK","NÉTAK"]
+        self.hheaders = ["ID","Név","Születési Idő","TAJ Szám","Adóazonosító","Jogviszony kezdete"]
 
 
     def data(self, index, role):
