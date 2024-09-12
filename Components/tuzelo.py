@@ -51,4 +51,5 @@ class Tuzelo(QWidget):
         self.print.setIconSize(QSize(40,40))
         self.print.setToolTip("Lista nyomtatása")
         self.print.setFixedSize(50,50)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.BF.layout.addWidget(self.print,0,1)

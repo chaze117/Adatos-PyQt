@@ -10,13 +10,14 @@ from firebase_admin import db
 from Components.classes import *
 from datetime import date
 import Components.firebase as FB
+import Components.functions as F
 
 
 class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow,self).__init__(*args,**kwargs)
-        self.setWindowTitle("Adatkezelő Alaklmazás")
+        self.setWindowTitle("Adatkezelő Alkalmazás")
         height = 825
         self.setGeometry(200,50,1165,height)
         self.setFixedSize(1165,height)
@@ -28,9 +29,39 @@ class MainWindow(QMainWindow):
         self.show()
         self.szemButtons = self.tabs_widget.tab1.buttonsF
         self.szemButtons.newD.clicked.connect(self.newDolgozo)
-        self.Dolgozok = []
+
         self.Dolgozok = FB.getDolgozok()
-        FB.fillSearchCB(self.Dolgozok, self.tabs_widget.tab1.searchCB)
+        self.Gyerekek = FB.getGyerekek()
+        self.Gyerekek_n = FB.getNGyerekek()
+        self.Munkairanyitok = FB.getMunkairanyitok()
+        self.Munkakorok = FB.getMunkakorok()
+        self.Programok = FB.getProgramok()
+        self.Szamlaszamok = FB.getSzamlaszamok()
+
+        F.fillSearchCB(self)
+        F.fillMunkakorCB(self)
+        F.fillProgramCB(self)
+        F.fillMunkairanyitoCB(self)
+        F.fillTuzeloData(self,False)
+
+        self.tabs_widget.tab1.searchCB.currentIndexChanged.connect(lambda: F.SelectedDolgozo(self))
+        self.tabs_widget.tab1.adoF.tab1.CSJKCB.currentIndexChanged.connect(lambda: F.SelectedCSJK(self.tabs_widget.tab1.adoF.tab1.CSJKCB.currentIndex(),self))
+        self.tabs_widget.tab1.adoF.tab2.NETAKCB.currentIndexChanged.connect(lambda: F.SelectedNETAK(self.tabs_widget.tab1.adoF.tab2.NETAKCB.currentIndex(),self))
+        self.tabs_widget.tab2.progCB.currentIndexChanged.connect(lambda: F.fillOrvosiData(self))
+        self.tabs_widget.tab2.oSlider.valueChanged.connect(lambda: F.fillOrvosiData(self))
+        self.tabs_widget.tab3.progCB.currentIndexChanged.connect(lambda: F.fillProgramData(self))
+        self.tabs_widget.tab4.refresh.clicked.connect(lambda: F.fillTuzeloData(self,True))
+        self.tabs_widget.tab5.munkCB.currentIndexChanged.connect(lambda: F.FillMunkairanyitoData(self))
+        self.tabs_widget.tab6.mkCb.currentIndexChanged.connect(lambda: F.settingsMunkakorok(self))
+        self.tabs_widget.tab6.miCb.currentIndexChanged.connect(lambda: F.settingsMunkairanyitok(self))
+        self.tabs_widget.tab6.pgCb.currentIndexChanged.connect(lambda: F.settingsProgramok(self))
+
+
+        self.tabs_widget.tab1.searchCB.setInsertPolicy(QComboBox.NoInsert)
+        completer = CustomQCompleter(self.tabs_widget.tab1.searchCB)
+        completer.setCompletionMode(QCompleter.PopupCompletion)
+        completer.setModel(self.tabs_widget.tab1.searchCB.model())
+        self.tabs_widget.tab1.searchCB.setCompleter(completer)
 
         
     def newDolgozo(self):
@@ -110,7 +141,7 @@ class NewDolgozo(QMainWindow):
     
     def closeEvent(self, event):
             self.parent().Dolgozok = FB.getDolgozok()
-            FB.fillSearchCB(self.parent().Dolgozok, self.parent().tabs_widget.tab1.searchCB)
+            F.fillSearchCB(self.parent().Dolgozok, self.parent().tabs_widget.tab1.searchCB)
             event.accept()
 
     def saveClicked(self):

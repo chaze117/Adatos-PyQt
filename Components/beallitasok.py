@@ -152,3 +152,4 @@ class Beallitasok(QWidget):
         self.pgButGrid.layout.addWidget(self.pgdel,0,2)
         #endregion
         self.layout.addWidget(self.nullFrame,0,1)
+

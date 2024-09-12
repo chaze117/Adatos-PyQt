@@ -76,5 +76,5 @@ class Orvosi(QWidget):
         self.Grid2.layout.addWidget(self.print,0,1)
 
 
-
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.setLayout(self.layout)

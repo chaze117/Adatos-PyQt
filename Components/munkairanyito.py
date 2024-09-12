@@ -44,20 +44,7 @@ class Munkairanyito(QWidget):
         self.layout.addWidget(self.munkCB)
         self.table = QTableView()
         self.layout.addWidget(self.table)
-        data = [
-            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
-            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
-            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
-            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
-            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
-            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
-            ["1", "Nagy Péter", "1991.08.20",   "044138370", "2024.09.01"],
-            ]
-
-
-
-        self.model = TableModel(data)
-        self.table.setModel(self.model)
+        
         
         self.BF = QFrame()
         self.BF.layout=QVBoxLayout()
@@ -84,4 +71,5 @@ class Munkairanyito(QWidget):
         self.jelenleti.setFixedSize(50,50)
         self.jelenleti.setToolTip("Jelenléti nyomtatása")
         self.bottomFrame.layout.addWidget(self.jelenleti,0,0)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.setLayout(self.layout)

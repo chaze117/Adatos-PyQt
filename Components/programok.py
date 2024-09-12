@@ -65,7 +65,7 @@ class Programok(QWidget):
         self.bottomFrame.layout.addWidget(self.rename,0,1)
 
 
-
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.setLayout(self.layout)
     def update(self,value):
         self.oLabel.setText(f"Lejár {value} napon belül")
