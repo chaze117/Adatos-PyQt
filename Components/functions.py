@@ -117,6 +117,10 @@ def fillMunkakorCB(window:any):
         window.tabs_widget.tab6.mkCb.addItem(f"{munkakor.id}. {munkakor.nev}")
 
 def fillProgramCB(window:any):
+    window.tabs_widget.tab1.jvF.progC.clear()
+    window.tabs_widget.tab2.progCB.clear()
+    window.tabs_widget.tab3.progCB.clear()
+    window.tabs_widget.tab6.pgCb.clear()
     for program in window.Programok:
       if program is not None:
         window.tabs_widget.tab1.jvF.progC.addItem(f"{program.id}. {program.r_nev}")
@@ -125,6 +129,9 @@ def fillProgramCB(window:any):
         window.tabs_widget.tab6.pgCb.addItem(f"{program.id}. {program.r_nev}")
 
 def fillMunkairanyitoCB(window:any):
+    window.tabs_widget.tab1.jvF.mirC.clear()
+    window.tabs_widget.tab5.munkCB.clear()
+    window.tabs_widget.tab6.miCb.clear()
     for munkairanyito in window.Munkairanyitok:
       if munkairanyito is not None:
         window.tabs_widget.tab1.jvF.mirC.addItem(f"{munkairanyito.id}. {munkairanyito.nev}")
@@ -135,29 +142,31 @@ def fillOrvosiData(window:any):
     today = date.today()
     window.tabs_widget.tab2.oLabel.setText(f"Lejár {window.tabs_widget.tab2.oSlider.value()} napon belül")
     oData = []
-    id = window.tabs_widget.tab2.progCB.currentText().split('.')
-    id = int(id[0])
-    newtime = today + timedelta(days=window.tabs_widget.tab2.oSlider.value())
-    for dolgozo in window.Dolgozok:
-        if dolgozo is not None and dolgozo.pid == id:
-                y,m,d = dolgozo.orvosi[0:10].split('-')
-                dolOrv = datetime.date(int(y),int(m),int(d))
-                if dolOrv < newtime:
-                    oData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_hely,dolgozo.sz_ido[0:10],dolgozo.a_nev,dolgozo.cim,dolgozo.taj_sz.replace("-",""),dolgozo.orvosi[0:10].replace('-','.')))
-    oData.append(("","","","","","","",""))
-    model = orvosiTM(oData)
-    window.tabs_widget.tab2.table.setModel(model)
+    if window.tabs_widget.tab2.progCB.currentText() != "":
+        id = window.tabs_widget.tab2.progCB.currentText().split('.')
+        id = int(id[0])
+        newtime = today + timedelta(days=window.tabs_widget.tab2.oSlider.value())
+        for dolgozo in window.Dolgozok:
+            if dolgozo is not None and dolgozo.pid == id:
+                    y,m,d = dolgozo.orvosi[0:10].split('-')
+                    dolOrv = datetime.date(int(y),int(m),int(d))
+                    if dolOrv < newtime:
+                        oData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_hely,dolgozo.sz_ido[0:10],dolgozo.a_nev,dolgozo.cim,dolgozo.taj_sz.replace("-",""),dolgozo.orvosi[0:10].replace('-','.')))
+        oData.append(("","","","","","","",""))
+        model = orvosiTM(oData)
+        window.tabs_widget.tab2.table.setModel(model)
 
 def fillProgramData(window:any):
-      id = window.tabs_widget.tab3.progCB.currentText().split('.')
-      id = int(id[0])
-      progData = []
-      for dolgozo in window.Dolgozok:
-            if dolgozo is not None and dolgozo.pid == id:
-                  progData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.ado_sz,dolgozo.jog_k[0:10].replace('-','.')))
-      progData.append(("","","","","","","",""))
-      model = progTM(progData)
-      window.tabs_widget.tab3.table.setModel(model)
+      if window.tabs_widget.tab3.progCB.currentText() != '':
+        id = window.tabs_widget.tab3.progCB.currentText().split('.')
+        id = int(id[0])
+        progData = []
+        for dolgozo in window.Dolgozok:
+                if dolgozo is not None and dolgozo.pid == id:
+                    progData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.ado_sz,dolgozo.jog_k[0:10].replace('-','.')))
+        progData.append(("","","","","","","",""))
+        model = progTM(progData)
+        window.tabs_widget.tab3.table.setModel(model)
 
 def fillTuzeloData(window:any, refresh:bool):
     if refresh is True:
@@ -173,15 +182,16 @@ def fillTuzeloData(window:any, refresh:bool):
     window.tabs_widget.tab4.table.setModel(model)
 
 def FillMunkairanyitoData(window:any):
-    id = window.tabs_widget.tab5.munkCB.currentText().split('.')
-    id = int(id[0])
-    munkairData = []
-    for dolgozo in window.Dolgozok:
-          if dolgozo is not None and dolgozo.mir == id:
-                munkairData.append((dolgozo.id, dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.jog_v[0:10].replace('-','.')))
-    munkairData.append(("","","","",""))
-    model = mirTM(munkairData)
-    window.tabs_widget.tab5.table.setModel(model)
+    if window.tabs_widget.tab5.munkCB.currentText() != '':
+        id = window.tabs_widget.tab5.munkCB.currentText().split('.')
+        id = int(id[0])
+        munkairData = []
+        for dolgozo in window.Dolgozok:
+            if dolgozo is not None and dolgozo.mir == id:
+                    munkairData.append((dolgozo.id, dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.jog_v[0:10].replace('-','.')))
+        munkairData.append(("","","","",""))
+        model = mirTM(munkairData)
+        window.tabs_widget.tab5.table.setModel(model)
 
 def settingsMunkakorok(window:any):
     if window.tabs_widget.tab6.mkCb.currentText() != '':
@@ -220,6 +230,25 @@ def settingsMunkairanyitok(window:any):
         id = int(id[0])
         window.tabs_widget.tab6.minameT.setText(window.Munkairanyitok[id].nev)
 
+def modMunkairanyito(window:any):
+    if window.tabs_widget.tab6.miCb.currentText() != '':
+        id = window.tabs_widget.tab6.miCb.currentText().split('.')
+        munkairanyito = Munkairanyito(int(id[0]), window.tabs_widget.tab6.minameT.text())
+        ref = db.reference("munkairanyitok")
+        d = json.loads(munkairanyito.toJSON())
+        ref.child(str(munkairanyito.id)).set(d)
+        window.Munkairanyitok = FB.getMunkairanyitok()
+        fillMunkairanyitoCB(window)
+
+def delMunkairanyito(window:any):
+    if window.tabs_widget.tab6.miCb.currentText() != '':
+        id = window.tabs_widget.tab6.miCb.currentText().split('.')
+        ref = db.reference("munkairanyitok")
+        ref.child(id[0]).set({})
+        window.Munkairanyitok = FB.getMunkairanyitok()
+        fillMunkairanyitoCB(window)
+
+
 
 def settingsProgramok(window:any):
     if window.tabs_widget.tab6.pgCb.currentText() != "":
@@ -228,3 +257,21 @@ def settingsProgramok(window:any):
         window.tabs_widget.tab6.pghnevT.setText(window.Programok[id].h_nev)
         window.tabs_widget.tab6.pgrnevT.setText(window.Programok[id].r_nev)
         window.tabs_widget.tab6.pghatT.setText(window.Programok[id].hatosagi)
+
+def modProgram(window:any):
+    if window.tabs_widget.tab6.pgCb.currentText() != "":
+        id = window.tabs_widget.tab6.pgCb.currentText().split('.')
+        program = Program(int(id[0]), window.tabs_widget.tab6.pgrnevT.text(),window.tabs_widget.tab6.pghnevT.text(),window.tabs_widget.tab6.pghatT.text())
+        ref = db.reference("programok")
+        d = json.loads(program.toJSON())
+        ref.child(str(program.id)).set(d)
+        window.Programok = FB.getProgramok()
+        fillProgramCB(window)
+
+def delProgram(window:any):
+    if window.tabs_widget.tab6.pgCb.currentText() != "":
+        id = window.tabs_widget.tab6.pgCb.currentText().split('.')
+        ref = db.reference("programok")
+        ref.child(id[0]).set({})
+        window.Programok = FB.getProgramok()
+        fillProgramCB(window)

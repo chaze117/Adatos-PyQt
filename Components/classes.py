@@ -110,6 +110,13 @@ class Gyerek:
     sz_ido: str
     taj: str
 
+    def toJSON(self):
+        return json.dumps(
+            self,
+            default=lambda o: o.__dict__, 
+            sort_keys=True,
+            indent=4)
+
     @staticmethod
     def from_dict(obj: Any) -> 'Gyerek':
         if obj is not None:
@@ -134,6 +141,13 @@ class Gyerek_NETAK:
     sz_id: int
     sz_ido: str
 
+    def toJSON(self):
+        return json.dumps(
+            self,
+            default=lambda o: o.__dict__, 
+            sort_keys=True,
+            indent=4)
+
     @staticmethod
     def from_dict(obj: Any) -> 'Gyerek_NETAK':
         if obj is not None:
@@ -150,6 +164,13 @@ class Gyerek_NETAK:
 class Munkairanyito:
         id:int
         nev:str
+
+        def toJSON(self):
+            return json.dumps(
+                self,
+                default=lambda o: o.__dict__, 
+                sort_keys=True,
+                indent=4)
 
         @staticmethod
         def from_dict(obj:Any) -> 'Munkairanyito':
@@ -187,6 +208,13 @@ class Program:
         h_nev:str
         hatosagi:str
 
+        def toJSON(self):
+            return json.dumps(
+                self,
+                default=lambda o: o.__dict__, 
+                sort_keys=True,
+                indent=4)
+
         @staticmethod
         def from_dict(obj:Any) -> 'Program':
                 if obj is not None:
@@ -200,6 +228,13 @@ class Program:
 class Szamlaszam:
         id:int
         base64:str
+
+        def toJSON(self):
+            return json.dumps(
+                self,
+                default=lambda o: o.__dict__, 
+                sort_keys=True,
+                indent=4)
         
         @staticmethod
         def from_dict(obj:Any) -> 'Szamlaszam':
