@@ -27,7 +27,19 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.tabs_widget)
         self.setStyleSheet('font-size: 10pt; font-family: Arial;')
         self.show()
+
         self.tabs_widget.tab1.buttonsF.newD.clicked.connect(self.newDolgozo)
+        self.tabs_widget.tab1.buttonsF.editD.clicked.connect(lambda: F.modDolgozo(self))
+        self.tabs_widget.tab1.buttonsF.delD.clicked.connect(lambda: F.delDolgozo(self))
+
+        self.tabs_widget.tab1.adoF.tab1.newCSJK.clicked.connect(self.newCSJK)
+        self.tabs_widget.tab1.adoF.tab1.editCSJK.clicked.connect(lambda: F.modCSJK(self))
+        self.tabs_widget.tab1.adoF.tab1.delCSJK.clicked.connect(lambda: F.delCSJK(self))
+        self.tabs_widget.tab1.adoF.tab1.moveCSJK.clicked.connect(self.moveCSJK)
+
+        self.tabs_widget.tab1.adoF.tab2.newNETAK.clicked.connect(self.newNETAK)
+        self.tabs_widget.tab1.adoF.tab2.editNETAK.clicked.connect(lambda: F.modNETAK(self))
+        self.tabs_widget.tab1.adoF.tab2.delNETAK.clicked.connect(lambda: F.delNETAK(self))
 
         self.tabs_widget.tab6.mknew.clicked.connect(self.newMunkakor)
         self.tabs_widget.tab6.mkedit.clicked.connect(lambda: F.modMunkakor(self))
@@ -91,7 +103,29 @@ class MainWindow(QMainWindow):
         self.dialog = NewProgram(parent=self)
         self.dialog.show()
 
-      
+    def newCSJK(self):
+        if self.tabs_widget.tab1.searchCB.currentText() != '':
+            pid = self.tabs_widget.tab1.searchCB.currentText().split('.')
+            pid=int(pid[0])
+            self.dialog = NewCSJK(parent=self, pid=pid)
+            self.dialog.show()
+
+    def moveCSJK(self):
+        if self.tabs_widget.tab1.adoF.tab1.CSJKCB.currentText() != '':
+            id = self.tabs_widget.tab1.adoF.tab1.CSJKCB.currentText().split('.')
+            id = int(id[0])
+            if self.tabs_widget.tab1.searchCB.currentText() != '':
+                pid = self.tabs_widget.tab1.searchCB.currentText().split('.')
+                pid = int(pid[0])
+            self.dialog = MoveCSJK(parent=self,id=id,pid=pid)
+            self.dialog.show()
+
+    def newNETAK(self):
+      if self.tabs_widget.tab1.searchCB.currentText() != '':
+            pid = self.tabs_widget.tab1.searchCB.currentText().split('.')
+            pid=int(pid[0])
+            self.dialog = NewNETAK(parent=self, pid=pid)
+            self.dialog.show()
 
 class NewDolgozo(QMainWindow):
     def __init__(self, *args,parent=None, **kwargs):
@@ -315,6 +349,8 @@ class NewMunkairanyito(QMainWindow):
 class NewProgram(QMainWindow):
     def __init__(self, *args, parent=None, **kwargs):
         super(NewProgram,self).__init__(*args,parent,**kwargs)
+        self.setWindowTitle("Új Program")
+        self.setWindowIcon(QIcon('icon.ico'))
         self.MainFrame = QFrame()
         self.setFixedSize(380,220)
         self.MainFrame.setStyleSheet('font: bold 10pt; font-family: Arial;')
@@ -363,4 +399,191 @@ class NewProgram(QMainWindow):
         program = Program(nextID,self.pgrnevT.text(),self.pghnevT.text(),self.pghatT.text())
         m = json.loads(program.toJSON())
         ref.child(str(program.id)).set(m)
+        self.close()
+
+class NewCSJK(QMainWindow):
+    def __init__(self, *args,parent=None, pid=None,**kwargs):
+        super(NewCSJK,self).__init__(*args,parent, **kwargs)
+        self.setWindowTitle("Új Gyermek")
+        self.setWindowIcon(QIcon('icon.ico'))
+        self.MainFrame = QFrame()
+        self.setFixedSize(380,300)
+        self.MainFrame.setStyleSheet('font: bold 10pt; font-family: Arial;')
+        self.setCentralWidget(self.MainFrame)
+        self.MainFrame.layout = QVBoxLayout()
+        self.MainFrame.setLayout(self.MainFrame.layout)
+        self.Parent = parent
+        self.pid = pid
+        self.mkGrid = QFrame()
+        self.mkGrid.layout = QGridLayout()
+        self.mkGrid.setLayout(self.mkGrid.layout)
+        self.mkGrid.setFixedSize(360,290)
+        self.MainFrame.layout.addWidget(self.mkGrid)
+
+        self.nameL = QLabel("Név:")
+        self.mkGrid.layout.addWidget(self.nameL,0,0)
+        self.nameT = QLineEdit()
+        self.mkGrid.layout.addWidget(self.nameT,0,1)
+        self.anevL = QLabel("Anyja Neve:")
+        self.mkGrid.layout.addWidget(self.anevL,1,0)
+        self.anevT = QLineEdit()
+        self.mkGrid.layout.addWidget(self.anevT,1,1)
+        self.szhL = QLabel("Születési Hely:")
+        self.mkGrid.layout.addWidget(self.szhL,2,0)
+        self.szhT = QLineEdit()
+        self.mkGrid.layout.addWidget(self.szhT,2,1)
+        self.sziL = QLabel("Születési Idő")
+        self.mkGrid.layout.addWidget(self.sziL,3,0)
+        self.sziD = QDateEdit(calendarPopup=True)
+        self.mkGrid.layout.addWidget(self.sziD,3,1)
+        self.adoL = QLabel("Adóazonosító:")
+        self.mkGrid.layout.addWidget(self.adoL,4,0)
+        self.adoT = QLineEdit()
+        self.adoT.setInputMask("9999999999")
+        self.mkGrid.layout.addWidget(self.adoT,4,1)
+        self.tajL = QLabel("TAJ Szám:")
+        self.mkGrid.layout.addWidget(self.tajL,5,0)
+        self.tajT = QLineEdit()
+        self.tajT.setInputMask("999-999-999")
+        self.mkGrid.layout.addWidget(self.tajT,5,1)
+        self.cimL = QLabel("Cím:")
+        self.mkGrid.layout.addWidget(self.cimL,6,0)
+        self.cimT = QLineEdit()
+        self.mkGrid.layout.addWidget(self.cimT,6,1)
+
+        self.mknew = QPushButton(qta.icon('fa.floppy-o'),"")
+        self.mknew.setIconSize(QSize(40,40))
+        self.mknew.setFixedSize(50,50)
+        self.mknew.setToolTip("Új Gyermek")
+        self.mkGrid.layout.addWidget(self.mknew,7,0)
+        self.mknew.clicked.connect(self.saveClicked)
+
+    def closeEvent(self, event):
+        self.Parent.Gyerekek = FB.getGyerekek()
+        F.fillCSJK(self.parent(), self.pid)
+        event.accept()
+    
+    def saveClicked(self):
+        ref = db.reference("gyerek")
+        _temp = ref.get()
+        Gyerekek = []
+        for i in range(0,len(_temp)):
+            Gyerekek.append(Gyerek.from_dict(_temp[i]))
+        nextID = int(Gyerekek[len(Gyerekek)-1].id)+1
+        gyerek = Gyerek(
+            self.anevT.text(),
+            self.adoT.text(),
+            self.cimT.text(),
+            nextID,
+            self.nameT.text(),
+            self.szhT.text(),
+            self.pid,
+            self.sziD.date().toString("yyyy-MM-dd"),
+            self.tajT.text().replace("-","")
+        )
+        m = json.loads(gyerek.toJSON())
+        ref.child(str(gyerek.id)).set(m)
+        self.close()
+
+class MoveCSJK(QMainWindow):
+    def __init__(self, *args,parent=None, id=None, pid=None,**kwargs):
+        super(MoveCSJK,self).__init__(*args,parent, **kwargs)
+        self.id = id
+        self.pid = pid
+        self.setWindowTitle("Gyermek áthelyezése másik szülőhöz")
+        self.setWindowIcon(QIcon('icon.ico'))
+        self.MainFrame = QFrame()
+        self.setFixedSize(380,100)
+        self.MainFrame.setStyleSheet('font: bold 10pt; font-family: Arial;')
+        self.setCentralWidget(self.MainFrame)
+        self.MainFrame.layout = QVBoxLayout()
+        self.MainFrame.setLayout(self.MainFrame.layout)
+
+        self.dolgCB = QComboBox()
+        self.MainFrame.layout.addWidget(self.dolgCB)
+        for dolgozo in parent.Dolgozok:
+            if dolgozo is not None:
+                self.dolgCB.addItem(f"{dolgozo.id}. {dolgozo.nev} - {dolgozo.sz_ido[0:10].replace('-','.')}")
+        self.moveCSJK = QPushButton(qta.icon('ri.user-shared-2-fill'),"")
+        self.moveCSJK.setIconSize(QSize(40,40))
+        self.moveCSJK.setFixedSize(50,50)
+        self.moveCSJK.setToolTip("Gyermek áthelyezése másik szülőhöz")
+        self.MainFrame.layout.addWidget(self.moveCSJK)
+        self.moveCSJK.clicked.connect(self.moveClicked)
+    
+    def closeEvent(self, event):
+        self.parent().Gyerekek = FB.getGyerekek()
+        F.fillCSJK(self.parent(),self.pid)
+
+    def moveClicked(self):
+        sz_id = self.dolgCB.currentText().split('.')
+        ref = db.reference("gyerek")
+        ref.child(str(self.id)).update({"sz_id": sz_id[0]})
+        self.close()
+
+class NewNETAK(QMainWindow):
+    def __init__(self, *args,parent=None, pid=None,**kwargs):
+        super(NewNETAK,self).__init__(*args,parent, **kwargs)
+        self.setWindowTitle("Új Gyermek")
+        self.setWindowIcon(QIcon('icon.ico'))
+        self.MainFrame = QFrame()
+        self.setFixedSize(380,220)
+        self.MainFrame.setStyleSheet('font: bold 10pt; font-family: Arial;')
+        self.setCentralWidget(self.MainFrame)
+        self.MainFrame.layout = QGridLayout()
+        self.MainFrame.setLayout(self.MainFrame.layout)
+        self.pid = pid
+        self.Parent = parent
+        self.nameL = QLabel("Név:")
+        self.MainFrame.layout.addWidget(self.nameL,0,0)
+        self.nameT = QLineEdit()
+        self.MainFrame.layout.addWidget(self.nameT,0,1)
+        self.anevL = QLabel("Anyja Neve:")
+        self.MainFrame.layout.addWidget(self.anevL,1,0)
+        self.anevT = QLineEdit()
+        self.MainFrame.layout.addWidget(self.anevT,1,1)
+        self.szhL = QLabel("Születési Hely:")
+        self.MainFrame.layout.addWidget(self.szhL,2,0)
+        self.szhT = QLineEdit()
+        self.MainFrame.layout.addWidget(self.szhT,2,1)
+        self.sziL = QLabel("Születési Idő")
+        self.MainFrame.layout.addWidget(self.sziL,3,0)
+        self.sziD = QDateEdit(calendarPopup=True)
+        self.MainFrame.layout.addWidget(self.sziD,3,1)
+        self.adoL = QLabel("Adóazonosító:")
+        self.MainFrame.layout.addWidget(self.adoL,4,0)
+        self.adoT = QLineEdit()
+        self.adoT.setInputMask("9999999999")
+        self.MainFrame.layout.addWidget(self.adoT,4,1)
+
+        self.mknew = QPushButton(qta.icon('fa.floppy-o'),"")
+        self.mknew.setIconSize(QSize(40,40))
+        self.mknew.setFixedSize(50,50)
+        self.mknew.setToolTip("Új Gyermek")
+        self.MainFrame.layout.addWidget(self.mknew,5,0)
+        self.mknew.clicked.connect(self.saveClicked)
+
+    def closeEvent(self, event):
+        self.Parent.Gyerekek_n = FB.getNGyerekek()
+        F.fillNETAK(self.parent(), self.pid)
+        event.accept()
+
+    def saveClicked(self):
+        ref = db.reference("gyerek_netak")
+        _temp = ref.get()
+        Gyerekek = []
+        for i in range(0,len(_temp)):
+            Gyerekek.append(Gyerek_NETAK.from_dict(_temp[i]))
+        nextID = int(Gyerekek[len(Gyerekek)-1].id)+1
+        gyerek = Gyerek_NETAK(
+            self.anevT.text(),
+            self.adoT.text(),
+            nextID,
+            self.nameT.text(),
+            self.szhT.text(),
+            self.pid,
+            self.sziD.date().toString("yyyy-MM-dd")
+        )
+        m = json.loads(gyerek.toJSON())
+        ref.child(str(gyerek.id)).set(m)
         self.close()

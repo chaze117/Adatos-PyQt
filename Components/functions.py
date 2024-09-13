@@ -1,6 +1,3 @@
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
 import datetime
 from datetime import date, timedelta
 from Components.orvosi import TableModel as orvosiTM
@@ -8,16 +5,12 @@ from Components.programok import TableModel as progTM
 from Components.tuzelo import TableModel as tuzeloTM
 from Components.munkairanyito import TableModel as mirTM
 import Components.firebase as FB
-from Components.classes import *
-from firebase_admin import credentials
 from firebase_admin import db
 from Components.classes import *
 
 def SelectedDolgozo(window:any):
     SzemAdat = window.tabs_widget.tab1.szemadatF
     JogvAdat = window.tabs_widget.tab1.jvF
-    CSJK = window.tabs_widget.tab1.adoF.tab1
-    NETAK = window.tabs_widget.tab1.adoF.tab2
     today = date.today()
     if window.tabs_widget.tab1.searchCB.currentText() != '':
         id = window.tabs_widget.tab1.searchCB.currentText().split('.')
@@ -55,26 +48,36 @@ def SelectedDolgozo(window:any):
         JogvAdat.ugyT.setText(window.Dolgozok[id].ugyirat)
         y,m,d = window.Dolgozok[id].orvosi[0:10].split('-')
         JogvAdat.orvosiT.setDate(QDate(int(y),int(m),int(d)))
-        CSJK.CSJKCB.clear()
-        CSJK.nameT.clear()
-        CSJK.anevT.clear()
-        CSJK.szhT.clear()
-        CSJK.sziD.setDate(today)
-        CSJK.adoT.clear()
-        CSJK.tajT.clear()
-        CSJK.cimT.clear()
-        for gyerek in window.Gyerekek:
-            if gyerek is not None and int(gyerek.sz_id) == id:
-                    CSJK.CSJKCB.addItem(f"{gyerek.id}. {gyerek.nev} - {gyerek.sz_ido[0:10].replace('-','.')}")
-        NETAK.NETAKCB.clear()
-        NETAK.nameT.clear()
-        NETAK.anevT.clear()
-        NETAK.szhT.clear()
-        NETAK.sziD.setDate(today)
-        NETAK.adoT.clear()
-        for gyerek in window.Gyerekek_n:
-            if gyerek is not None and int(gyerek.sz_id) == id:
-                    NETAK.NETAKCB.addItem(f"{gyerek.id}. {gyerek.nev} - {gyerek.sz_ido[0:10].replace('-','.')}")
+        fillCSJK(window,id)
+        fillNETAK(window,id)
+
+def fillCSJK(window:any,id):
+    CSJK = window.tabs_widget.tab1.adoF.tab1
+    today = date.today()
+    CSJK.CSJKCB.clear()
+    CSJK.nameT.clear()
+    CSJK.anevT.clear()
+    CSJK.szhT.clear()
+    CSJK.sziD.setDate(today)
+    CSJK.adoT.clear()
+    CSJK.tajT.clear()
+    CSJK.cimT.clear()
+    for gyerek in window.Gyerekek:
+        if gyerek is not None and int(gyerek.sz_id) == id:
+                CSJK.CSJKCB.addItem(f"{gyerek.id}. {gyerek.nev} - {gyerek.sz_ido[0:10].replace('-','.')}")
+
+def fillNETAK(window:any,id):
+    NETAK = window.tabs_widget.tab1.adoF.tab2
+    today = date.today()
+    NETAK.NETAKCB.clear()
+    NETAK.nameT.clear()
+    NETAK.anevT.clear()
+    NETAK.szhT.clear()
+    NETAK.sziD.setDate(today)
+    NETAK.adoT.clear()
+    for gyerek in window.Gyerekek_n:
+        if gyerek is not None and int(gyerek.sz_id) == id:
+                NETAK.NETAKCB.addItem(f"{gyerek.id}. {gyerek.nev} - {gyerek.sz_ido[0:10].replace('-','.')}")
 
 def SelectedCSJK(value,window:any):
     CSJK = window.tabs_widget.tab1.adoF.tab1
@@ -275,3 +278,101 @@ def delProgram(window:any):
         ref.child(id[0]).set({})
         window.Programok = FB.getProgramok()
         fillProgramCB(window)
+
+def modDolgozo(window:any):
+    if window.tabs_widget.tab1.searchCB.currentText() != "":
+        id = window.tabs_widget.tab1.searchCB.currentText().split(".")
+        mir = window.tabs_widget.tab1.jvF.mirC.currentText().split(".")
+        mkk = window.tabs_widget.tab1.jvF.mkC.currentText().split(".")
+        pid = window.tabs_widget.tab1.jvF.progC.currentText().split(".")
+        dolgozo = Dolgozo(
+            window.tabs_widget.tab1.szemadatF.anameT.text(),
+            window.tabs_widget.tab1.szemadatF.adoT.text(),
+            window.tabs_widget.tab1.szemadatF.cimT.text(),
+            int(id[0]),
+            window.tabs_widget.tab1.jvF.jkD.date().toString("yyyy-MM-dd"),
+            window.tabs_widget.tab1.jvF.jvD.date().toString("yyyy-MM-dd"),
+            window.tabs_widget.tab1.szemadatF.lnameT.text(),
+            int(mir[0]),
+            int(mkk[0]),
+            window.tabs_widget.tab1.szemadatF.nameT.text(),
+            window.tabs_widget.tab1.jvF.orvosiT.date().toString("yyyy-MM-dd"),
+            int(pid[0]),
+            window.tabs_widget.tab1.szemadatF.szhT.text(),
+            window.tabs_widget.tab1.szemadatF.sziD.date().toString("yyyy-MM-dd"),
+            window.tabs_widget.tab1.szemadatF.szamlaT.text().replace("-",""),
+            window.tabs_widget.tab1.szemadatF.szigT.text(),
+            window.tabs_widget.tab1.szemadatF.tajT.text().replace("-",""),
+            window.tabs_widget.tab1.szemadatF.telT.text().replace("+36/","").replace("-",""),
+            window.tabs_widget.tab1.szemadatF.tuzelo.isChecked(),
+            window.tabs_widget.tab1.jvF.ugyT.text())
+        ref = db.reference("dolgozok")
+        d = json.loads(dolgozo.toJSON())
+        ref.child(str(dolgozo.id)).set(d)
+        window.Dolgozok = FB.getDolgozok()
+        fillSearchCB(window)
+
+def delDolgozo(window:any):
+    if window.tabs_widget.tab1.searchCB.currentText() != "":
+        id = window.tabs_widget.tab1.searchCB.currentText().split('.')
+        ref = db.reference("dolgozok")
+        ref.child(id[0]).set({})
+        window.Dolgozok = FB.getDolgozok()
+        fillSearchCB(window)
+
+def modCSJK(window:any):
+    if window.tabs_widget.tab1.adoF.tab1.CSJKCB.currentText() != "":
+        id = window.tabs_widget.tab1.adoF.tab1.CSJKCB.currentText().split(".")
+        pid = window.tabs_widget.tab1.searchCB.currentText().split('.')
+        gyerek = Gyerek(
+            window.tabs_widget.tab1.adoF.tab1.anevT.text(),
+            window.tabs_widget.tab1.adoF.tab1.adoT.text(),
+            window.tabs_widget.tab1.adoF.tab1.cimT.text(),
+            int(id[0]),
+            window.tabs_widget.tab1.adoF.tab1.nameT.text(),
+            window.tabs_widget.tab1.adoF.tab1.szhT.text(),
+            int(pid[0]),
+            window.tabs_widget.tab1.adoF.tab1.sziD.date().toString("yyyy-MM-dd"),
+            window.tabs_widget.tab1.adoF.tab1.tajT.text().replace('-','')
+        )
+        ref = db.reference('gyerek')
+        d = json.loads(gyerek.toJSON())
+        ref.child(id[0]).set(d)
+        window.Gyerekek = FB.getGyerekek()
+        fillCSJK(window,int(pid[0]))
+
+def delCSJK(window:any):
+    if window.tabs_widget.tab1.adoF.tab1.CSJKCB.currentText() != "":
+        pid = window.tabs_widget.tab1.searchCB.currentText().split('.')
+        id = window.tabs_widget.tab1.adoF.tab1.CSJKCB.currentText().split(".")
+        ref = db.reference("gyerek")
+        ref.child(id[0]).set({})
+        window.Gyerekek = FB.getGyerekek()
+        fillCSJK(window,int(pid[0]))
+
+def modNETAK(window:any):
+    if window.tabs_widget.tab1.adoF.tab2.NETAKCB.currentText() != "":
+        id = window.tabs_widget.tab1.adoF.tab2.NETAKCB.currentText().split(".")
+        pid = window.tabs_widget.tab1.searchCB.currentText().split('.')
+        gyerek = Gyerek_NETAK(
+                window.tabs_widget.tab1.adoF.tab2.anevT.text(),
+                window.tabs_widget.tab1.adoF.tab2.adoT.text(),
+                int(id[0]),
+                window.tabs_widget.tab1.adoF.tab2.nameT.text(),
+                window.tabs_widget.tab1.adoF.tab2.szhT.text(),
+                int(pid[0]),
+                window.tabs_widget.tab1.adoF.tab2.sziD.date().toString("yyyy-MM-dd"))
+        ref = db.reference('gyerek_netak')
+        d = json.loads(gyerek.toJSON())
+        ref.child(id[0]).set(d)
+        window.Gyerekek_n = FB.getNGyerekek()
+        fillNETAK(window,int(pid[0]))
+
+def delNETAK(window:any):
+    if window.tabs_widget.tab1.adoF.tab2.NETAKCB.currentText() != "":   
+        id = window.tabs_widget.tab1.adoF.tab2.NETAKCB.currentText().split(".")
+        pid = window.tabs_widget.tab1.searchCB.currentText().split('.')
+        ref = db.reference('gyerek_netak')
+        ref.child(id[0]).set({})
+        window.Gyerekek_n = FB.getNGyerekek()
+        fillNETAK(window,int(pid[0]))
