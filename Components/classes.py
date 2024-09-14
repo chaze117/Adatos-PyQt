@@ -1,47 +1,54 @@
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PyQt6.QtGui import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
 from typing import Any
 from dataclasses import dataclass
 import json
 
-class CustomQCompleter(QCompleter):
-    """
-    adapted from: http://stackoverflow.com/a/7767999/2156909
-    """
-    def __init__(self, *args):#parent=None):
-        super(CustomQCompleter, self).__init__(*args)
-        self.local_completion_prefix = ""
-        self.source_model = None
-        self.filterProxyModel = QSortFilterProxyModel(self)
-        self.usingOriginalModel = False
 
+class ExtendedComboBox(QComboBox):
+    def __init__(self, parent=None):
+        super(ExtendedComboBox, self).__init__(parent)
+
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.setEditable(True)
+
+        # add a filter model to filter matching items
+        self.pFilterModel = QSortFilterProxyModel(self)
+        self.pFilterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.pFilterModel.setSourceModel(self.model())
+
+        # add a completer, which uses the filter model
+        self.completer = QCompleter(self.pFilterModel, self)
+        # always show all (filtered) completions
+        self.completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+        self.setCompleter(self.completer)
+
+        # connect signals
+        self.lineEdit().textEdited.connect(self.pFilterModel.setFilterFixedString)
+        self.completer.activated.connect(self.on_completer_activated)
+
+
+    # on selection of an item from the completer, select the corresponding item from combobox 
+    def on_completer_activated(self, text):
+        if text:
+            index = self.findText(text)
+            self.setCurrentIndex(index)
+            #self.activated[str].emit(self.itemText(index))
+
+
+    # on model change, update the models of the filter and completer as well 
     def setModel(self, model):
-        self.source_model = model
-        self.filterProxyModel = QSortFilterProxyModel(self)
-        self.filterProxyModel.setSourceModel(self.source_model)
-        super(CustomQCompleter, self).setModel(self.filterProxyModel)
-        self.usingOriginalModel = True
+        super(ExtendedComboBox, self).setModel(model)
+        self.pFilterModel.setSourceModel(model)
+        self.completer.setModel(self.pFilterModel)
 
-    def updateModel(self):
-        if not self.usingOriginalModel:
-            self.filterProxyModel.setSourceModel(self.source_model)
 
-        pattern = QRegExp(self.local_completion_prefix,
-                                Qt.CaseInsensitive,
-                                QRegExp.FixedString)
-
-        self.filterProxyModel.setFilterRegExp(pattern)
-
-    def splitPath(self, path):
-        self.local_completion_prefix = path
-        self.updateModel()
-        if self.filterProxyModel.rowCount() == 0:
-            self.usingOriginalModel = False
-            self.filterProxyModel.setSourceModel(QStringListModel([path]))
-            return [path]
-
-        return []
+    # on model column change, update the model column of the filter and completer as well
+    def setModelColumn(self, column):
+        self.completer.setCompletionColumn(column)
+        self.pFilterModel.setFilterKeyColumn(column)
+        super(ExtendedComboBox, self).setModelColumn(column)    
 
 @dataclass
 class Dolgozo:

@@ -1,7 +1,6 @@
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-import qdarktheme
+from PyQt6.QtGui import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
 import Components.tabs as tabs
 import qtawesome as qta
 import firebase_admin
@@ -11,18 +10,23 @@ from Components.classes import *
 from datetime import date
 import Components.firebase as FB
 import Components.functions as F
+import pdfcreation.munkaltatoi as MIG
+import locale
+
+
 
 
 class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow,self).__init__(*args,**kwargs)
+        locale.setlocale(locale.LC_ALL, '')
         self.setWindowTitle("Adatkezelő Alkalmazás")
         height = 825
         self.setGeometry(200,50,1165,height)
         self.setFixedSize(1165,height)
         self.setWindowIcon(QIcon('icon.ico'))
-        qdarktheme.setup_theme("auto")
+
         self.tabs_widget= tabs.Tabs(self)
         self.setCentralWidget(self.tabs_widget)
         self.setStyleSheet('font-size: 10pt; font-family: Arial;')
@@ -31,6 +35,7 @@ class MainWindow(QMainWindow):
         self.tabs_widget.tab1.buttonsF.newD.clicked.connect(self.newDolgozo)
         self.tabs_widget.tab1.buttonsF.editD.clicked.connect(lambda: F.modDolgozo(self))
         self.tabs_widget.tab1.buttonsF.delD.clicked.connect(lambda: F.delDolgozo(self))
+        self.tabs_widget.tab1.buttonsF.mki.clicked.connect(self.MakeMig)
 
         self.tabs_widget.tab1.adoF.tab1.newCSJK.clicked.connect(self.newCSJK)
         self.tabs_widget.tab1.adoF.tab1.editCSJK.clicked.connect(lambda: F.modCSJK(self))
@@ -81,20 +86,18 @@ class MainWindow(QMainWindow):
 
 
         self.tabs_widget.tab1.searchCB.setInsertPolicy(QComboBox.NoInsert)
-        completer = CustomQCompleter(self.tabs_widget.tab1.searchCB)
-        completer.setCompletionMode(QCompleter.PopupCompletion)
-        completer.setModel(self.tabs_widget.tab1.searchCB.model())
-        self.tabs_widget.tab1.searchCB.setCompleter(completer)
 
-        
+
+
+
     def newDolgozo(self):
             self.dialog = NewDolgozo(parent=self)
             self.dialog.show()
-    
+
     def newMunkakor(self):
          self.dialog = NewMunkakor(parent=self)
          self.dialog.show()
-    
+
     def newMunkairanyito(self):
          self.dialog = NewMunkairanyito(parent=self)
          self.dialog.show()
@@ -126,6 +129,33 @@ class MainWindow(QMainWindow):
             pid=int(pid[0])
             self.dialog = NewNETAK(parent=self, pid=pid)
             self.dialog.show()
+
+    def MakeMig(self):
+        if self.tabs_widget.tab1.searchCB.currentIndex() > -1:
+            id = self.tabs_widget.tab1.searchCB.currentText().split('.')
+            szemAdatok = self.tabs_widget.tab1.szemadatF
+            jogvAdatok = self.tabs_widget.tab1.jvF
+            _c = szemAdatok.cimT.text().split(' ')
+            cim = None
+            x = None
+            try:
+                x = int(_c[0])
+                cim = szemAdatok.cimT.text()
+            except:
+                cim = f"3931 Mezőzombor, {szemAdatok.cimT.text()}"
+            MIG.generateMig([
+                szemAdatok.nameT.text(),
+                szemAdatok.szhT.text(),
+                szemAdatok.sziD.date().toString("yyyy.MM.dd."),
+                szemAdatok.anameT.text(),
+                szemAdatok.adoT.text(),
+                szemAdatok.tajT.text(),
+                cim,
+                f"{self.Munkakorok[self.Dolgozok[int(id[0])].munkakor].brutto:n} Ft/hó",
+                f"{int(jogvAdatok.nettoT.text()):n} Ft/hó",
+                jogvAdatok.jkD.date().toString("yyyy.MM.dd."),
+                jogvAdatok.jvD.date().toString("yyyy.MM.dd."),
+                ])
 
 class NewDolgozo(QMainWindow):
     def __init__(self, *args,parent=None, **kwargs):
@@ -195,7 +225,7 @@ class NewDolgozo(QMainWindow):
         self.newD.clicked.connect(self.saveClicked)
         self.MainFrame.layout.addWidget(self.newD,11,0)
         self.MainFrame.setLayout(self.MainFrame.layout)
-    
+
     def closeEvent(self, event):
             self.parent().Dolgozok = FB.getDolgozok()
             F.fillSearchCB(self.parent())
@@ -333,7 +363,7 @@ class NewMunkairanyito(QMainWindow):
         self.parent().Munkairanyitok = FB.getMunkairanyitok()
         F.fillMunkairanyitoCB(self.parent())
         event.accept()
-    
+
     def saveClicked(self):
         ref = db.reference("munkairanyitok")
         _temp = ref.get()
@@ -383,7 +413,7 @@ class NewProgram(QMainWindow):
         self.mknew.setToolTip("Új program")
         self.mkGrid.layout.addWidget(self.mknew,4,0)
         self.mknew.clicked.connect(self.saveClicked)
-    
+
     def closeEvent(self,event):
         self.parent().Programok = FB.getProgramok()
         F.fillProgramCB(self.parent())
@@ -462,7 +492,7 @@ class NewCSJK(QMainWindow):
         self.Parent.Gyerekek = FB.getGyerekek()
         F.fillCSJK(self.parent(), self.pid)
         event.accept()
-    
+
     def saveClicked(self):
         ref = db.reference("gyerek")
         _temp = ref.get()
@@ -510,7 +540,7 @@ class MoveCSJK(QMainWindow):
         self.moveCSJK.setToolTip("Gyermek áthelyezése másik szülőhöz")
         self.MainFrame.layout.addWidget(self.moveCSJK)
         self.moveCSJK.clicked.connect(self.moveClicked)
-    
+
     def closeEvent(self, event):
         self.parent().Gyerekek = FB.getGyerekek()
         F.fillCSJK(self.parent(),self.pid)

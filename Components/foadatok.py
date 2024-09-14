@@ -1,7 +1,8 @@
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PyQt6.QtGui import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
 import qtawesome as qta
+from Components.classes import *
 
 
 
@@ -9,7 +10,7 @@ class FoAdatok(QWidget):
     def __init__(self, parent):
         super(QWidget,self).__init__(parent)
 
-        self.searchCB = QComboBox(editable=True)
+        self.searchCB = ExtendedComboBox()
 
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(self.searchCB)
@@ -365,7 +366,7 @@ class Buttons(QFrame):
         self.mki = QPushButton(qta.icon('fa5s.money-bill-wave'),"")
         self.mki.setIconSize(QSize(40,40))
         self.mki.setFixedSize(50,50)
-        self.mki.setToolTip("Dolgozó szerkesztése")
+        self.mki.setToolTip("Munkáltatói igazolás")
         self.layout.addWidget(self.mki,2,1)
 
         self.onk = QPushButton(qta.icon('fa5s.hand-holding-heart'),"")
@@ -396,9 +397,9 @@ class CustomQCompleter(QCompleter):
         if not self.usingOriginalModel:
             self.filterProxyModel.setSourceModel(self.source_model)
 
-        pattern = QRegExp(self.local_completion_prefix,
+        pattern = QRegularExpression(self.local_completion_prefix,
                                 Qt.CaseInsensitive,
-                                QRegExp.FixedString)
+                                QRegularExpression.FixedString)
 
         self.filterProxyModel.setFilterRegExp(pattern)
 
