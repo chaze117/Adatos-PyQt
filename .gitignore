@@ -2,5 +2,7 @@
 /Components/__pycache__
 /pdfcreation/__pycache__
 *pyc
-# test.py
+test.py
 serviceAccountKey.json
+*pdf
+/pdfjs

@@ -1,6 +1,8 @@
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
+from PyQt6.QtWebEngineWidgets import *
+from PyQt6.QtPrintSupport import *
 import Components.tabs as tabs
 import qtawesome as qta
 import firebase_admin
@@ -12,7 +14,9 @@ import Components.firebase as FB
 import Components.functions as F
 import pdfcreation.munkaltatoi as MIG
 import locale
-
+import os
+import win32api
+import time
 
 
 
@@ -156,6 +160,8 @@ class MainWindow(QMainWindow):
                 jogvAdatok.jkD.date().toString("yyyy.MM.dd."),
                 jogvAdatok.jvD.date().toString("yyyy.MM.dd."),
                 ])
+            self.dialog = PDFView(filename="mig.pdf")
+            self.dialog.show()
 
 class NewDolgozo(QMainWindow):
     def __init__(self, *args,parent=None, **kwargs):
@@ -617,3 +623,54 @@ class NewNETAK(QMainWindow):
         m = json.loads(gyerek.toJSON())
         ref.child(str(gyerek.id)).set(m)
         self.close()
+
+class PDFView(QMainWindow):
+    def __init__(self, *args,filename=None, **kwargs):
+        super(PDFView,self).__init__(*args, **kwargs)
+        self.setWindowTitle(f"PDF Olvasó: {filename}")
+        self.setWindowIcon(QIcon('icon.ico'))
+        self.showMaximized()
+        self.filename = filename
+        layout = QVBoxLayout()
+        self.web_view = QWebEngineView()
+        self.settings = self.web_view.settings()
+        self.settings.setAttribute(self.settings.WebAttribute.PluginsEnabled, True)
+        self.settings.setAttribute(self.settings.WebAttribute.PdfViewerEnabled, True)
+        self.settings.setAttribute(self.settings.WebAttribute.JavascriptCanOpenWindows, True)
+        self.settings.setAttribute(self.settings.WebAttribute.PrintElementBackgrounds, True)
+        self.web_view.page().printRequested.connect(self.handle_print_requested)
+        layout.addWidget(self.web_view)
+        self.container = QWidget()
+        self.container.setLayout(layout)
+        self.setCentralWidget(self.container)
+        cwd = os.getcwd()
+        self.fullpath = rf"{cwd}\{filename}"
+        self.web_view.setUrl(QUrl.fromLocalFile(self.fullpath))
+
+    def handle_print_requested(self):
+        if not self.fullpath:
+            print("No PDF file loaded for printing.")
+            return
+        self.show_print_dialog()
+    
+    def show_print_dialog(self):
+        """Shows a print dialog and prints the file."""
+        printer = QPrinter()
+        dialog = QPrintDialog(printer, self)
+        if dialog.exec() == QPrintDialog.DialogCode.Accepted:
+            self.print_file_with_printer()
+    
+    def print_file_with_printer(self):
+        if not os.path.exists(self.fullpath):
+            print(f"File {self.fullpath} does not exist.")
+            return
+        try:
+            win32api.ShellExecute(0, "print", self.fullpath, None, ".", 0)
+        except:
+            print("exeption")
+        
+
+    def closeEvent(self, event):
+        os.remove(self.filename)
+        event.accept()
+
