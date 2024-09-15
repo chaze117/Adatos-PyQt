@@ -5,7 +5,6 @@ from reportlab.pdfbase.pdfmetrics import stringWidth,registerFont
 from reportlab.pdfbase.ttfonts import TTFont
 from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPDF
-import pikepdf
 
 
 def generateMig(values):
@@ -61,5 +60,3 @@ def generateMig(values):
     text.textLine("munkáltató")
     c.drawText(text)
     c.save()
-    with pikepdf.open('mig.pdf') as pdf:
-     num_pages = len(pdf.pages)

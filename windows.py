@@ -13,6 +13,7 @@ from datetime import date
 import Components.firebase as FB
 import Components.functions as F
 import pdfcreation.munkaltatoi as MIG
+import pdfcreation.tuzelo as Tuz
 import locale
 import os
 import win32api
@@ -50,6 +51,9 @@ class MainWindow(QMainWindow):
         self.tabs_widget.tab1.adoF.tab2.editNETAK.clicked.connect(lambda: F.modNETAK(self))
         self.tabs_widget.tab1.adoF.tab2.delNETAK.clicked.connect(lambda: F.delNETAK(self))
 
+        self.tabs_widget.tab4.refresh.clicked.connect(lambda: F.fillTuzeloData(self,True))
+        self.tabs_widget.tab4.print.clicked.connect(self.MakeTuzelo)
+
         self.tabs_widget.tab6.mknew.clicked.connect(self.newMunkakor)
         self.tabs_widget.tab6.mkedit.clicked.connect(lambda: F.modMunkakor(self))
         self.tabs_widget.tab6.mkdel.clicked.connect(lambda: F.delMunkakor(self))
@@ -82,7 +86,6 @@ class MainWindow(QMainWindow):
         self.tabs_widget.tab2.progCB.currentIndexChanged.connect(lambda: F.fillOrvosiData(self))
         self.tabs_widget.tab2.oSlider.valueChanged.connect(lambda: F.fillOrvosiData(self))
         self.tabs_widget.tab3.progCB.currentIndexChanged.connect(lambda: F.fillProgramData(self))
-        self.tabs_widget.tab4.refresh.clicked.connect(lambda: F.fillTuzeloData(self,True))
         self.tabs_widget.tab5.munkCB.currentIndexChanged.connect(lambda: F.FillMunkairanyitoData(self))
         self.tabs_widget.tab6.mkCb.currentIndexChanged.connect(lambda: F.settingsMunkakorok(self))
         self.tabs_widget.tab6.miCb.currentIndexChanged.connect(lambda: F.settingsMunkairanyitok(self))
@@ -162,6 +165,12 @@ class MainWindow(QMainWindow):
                 ])
             self.dialog = PDFView(filename="mig.pdf")
             self.dialog.show()
+
+    def MakeTuzelo(self):
+        Tuz.generateTuzelo(self.Dolgozok)
+        self.dialog = PDFView(filename="tuzelo.pdf")
+        self.dialog.show()
+
 
 class NewDolgozo(QMainWindow):
     def __init__(self, *args,parent=None, **kwargs):
