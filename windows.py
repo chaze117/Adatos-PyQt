@@ -14,10 +14,12 @@ import Components.firebase as FB
 import Components.functions as F
 import pdfcreation.munkaltatoi as MIG
 import pdfcreation.tuzelo as Tuz
+import pdfcreation.jelenleti as J
 import locale
-import os
+import os,subprocess, time
 import win32api
-import time
+import datetime
+import win32com.client
 
 
 
@@ -57,6 +59,8 @@ class MainWindow(QMainWindow):
         self.tabs_widget.tab6.mknew.clicked.connect(self.newMunkakor)
         self.tabs_widget.tab6.mkedit.clicked.connect(lambda: F.modMunkakor(self))
         self.tabs_widget.tab6.mkdel.clicked.connect(lambda: F.delMunkakor(self))
+
+        self.tabs_widget.tab5.jelenleti.clicked.connect(self.Jelenleti)
 
         self.tabs_widget.tab6.minew.clicked.connect(self.newMunkairanyito)
         self.tabs_widget.tab6.miedit.clicked.connect(lambda: F.modMunkairanyito(self))
@@ -171,6 +175,11 @@ class MainWindow(QMainWindow):
         self.dialog = PDFView(filename="tuzelo.pdf")
         self.dialog.show()
 
+    def Jelenleti(self):
+        _date = datetime.date(self.tabs_widget.tab5.honap.date().year(),self.tabs_widget.tab5.honap.date().month(),1)
+        J.generateJelenleti(_date,self.tabs_widget.tab5.munkCB.currentText(),self.Dolgozok)
+        self.pdf = subprocess.run(['start', '', "jelenleti.pdf"], check=True, shell=True)
+       
 
 class NewDolgozo(QMainWindow):
     def __init__(self, *args,parent=None, **kwargs):
@@ -665,6 +674,10 @@ class PDFView(QMainWindow):
     def show_print_dialog(self):
         """Shows a print dialog and prints the file."""
         printer = QPrinter()
+        if self.filename == "jelenleti.pdf":
+            print("Works")
+            printer.setPageSize(QPageSize(QPageSize.PageSizeId.A3))
+            
         dialog = QPrintDialog(printer, self)
         if dialog.exec() == QPrintDialog.DialogCode.Accepted:
             self.print_file_with_printer()
