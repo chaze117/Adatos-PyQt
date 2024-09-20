@@ -15,6 +15,7 @@ import Components.functions as F
 import pdfcreation.munkaltatoi as MIG
 import pdfcreation.tuzelo as Tuz
 import pdfcreation.jelenleti as J
+import pdfcreation.netak as NETAK
 import locale
 import os,subprocess, time
 import win32api
@@ -48,6 +49,7 @@ class MainWindow(QMainWindow):
         self.tabs_widget.tab1.adoF.tab1.editCSJK.clicked.connect(lambda: F.modCSJK(self))
         self.tabs_widget.tab1.adoF.tab1.delCSJK.clicked.connect(lambda: F.delCSJK(self))
         self.tabs_widget.tab1.adoF.tab1.moveCSJK.clicked.connect(self.moveCSJK)
+        self.tabs_widget.tab1.adoF.tab2.printNETAK.clicked.connect(self.MakeNetak)
 
         self.tabs_widget.tab1.adoF.tab2.newNETAK.clicked.connect(self.newNETAK)
         self.tabs_widget.tab1.adoF.tab2.editNETAK.clicked.connect(lambda: F.modNETAK(self))
@@ -180,6 +182,21 @@ class MainWindow(QMainWindow):
         J.generateJelenleti(_date,self.tabs_widget.tab5.munkCB.currentText(),self.Dolgozok)
         self.pdf = subprocess.run(['start', '', "jelenleti.pdf"], check=True, shell=True)
        
+    def MakeNetak(self):
+        if self.tabs_widget.tab1.searchCB.currentIndex() > -1:
+            id = int(self.tabs_widget.tab1.searchCB.currentText().split('.')[0])
+            nev = self.tabs_widget.tab1.szemadatF.nameT.text()
+            ado = self.tabs_widget.tab1.szemadatF.adoT.text()
+            gyerekek = []
+            for gyerek in self.Gyerekek_n:
+                if gyerek is not None:
+                    if gyerek.sz_id == id:
+                        gyerekek.append(gyerek)
+            NETAK.generateNETAK(nev,ado,gyerekek)
+            self.dialog = PDFView(filename="netak.pdf")
+            self.dialog.show()
+
+
 
 class NewDolgozo(QMainWindow):
     def __init__(self, *args,parent=None, **kwargs):
