@@ -5,7 +5,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth,registerFont
 from reportlab.pdfbase.ttfonts import TTFont
 from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPDF
-
+import datetime
 
 def generateMig(values):
     PAGE_WIDTH  = defaultPageSize[0]
@@ -40,13 +40,15 @@ def generateMig(values):
         x=x-30
     text = c.beginText(50,300)
     text.setLeading(10)
+    now = datetime.datetime.now()
     text.textLines(
-        """Ezen igazolás a közfoglalkoztatott kérésére, hivatalos felhasználás\n
+        f"""Ezen igazolás a közfoglalkoztatott kérésére, hivatalos felhasználás\n
         céljából került kiállításra.\n
         A munkáltató ezen munkáltatói igazolás kiállításának időpontjában\n
         nem áll sem csődeljárás, sem felszámolás alatt.\n
         Igazoljuk továbbá, hogy nevezett dolgozó jelen időpontban nem áll\n
-        sem fegyelmi eljárás, sem felmondás alatt.""")
+        sem fegyelmi eljárás, sem felmondás alatt.\n\n
+        Kelt: Mezőzombor, {now.strftime("%Y.%m.%d")}""")
     c.drawText(text)
     ph = "PH"
     text_width = stringWidth(ph,fontName="Verdana",fontSize=20)

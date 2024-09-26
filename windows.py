@@ -16,6 +16,7 @@ import pdfcreation.munkaltatoi as MIG
 import pdfcreation.tuzelo as Tuz
 import pdfcreation.jelenleti as J
 import pdfcreation.netak as NETAK
+import pdfcreation.csjk as CSJK
 import locale
 import os,subprocess, time
 import win32api
@@ -49,11 +50,13 @@ class MainWindow(QMainWindow):
         self.tabs_widget.tab1.adoF.tab1.editCSJK.clicked.connect(lambda: F.modCSJK(self))
         self.tabs_widget.tab1.adoF.tab1.delCSJK.clicked.connect(lambda: F.delCSJK(self))
         self.tabs_widget.tab1.adoF.tab1.moveCSJK.clicked.connect(self.moveCSJK)
-        self.tabs_widget.tab1.adoF.tab2.printNETAK.clicked.connect(self.MakeNetak)
+        self.tabs_widget.tab1.adoF.tab1.printCSJK.clicked.connect(self.makeCSJK)
+        
 
         self.tabs_widget.tab1.adoF.tab2.newNETAK.clicked.connect(self.newNETAK)
         self.tabs_widget.tab1.adoF.tab2.editNETAK.clicked.connect(lambda: F.modNETAK(self))
         self.tabs_widget.tab1.adoF.tab2.delNETAK.clicked.connect(lambda: F.delNETAK(self))
+        self.tabs_widget.tab1.adoF.tab2.printNETAK.clicked.connect(self.MakeNetak)
 
         self.tabs_widget.tab4.refresh.clicked.connect(lambda: F.fillTuzeloData(self,True))
         self.tabs_widget.tab4.print.clicked.connect(self.MakeTuzelo)
@@ -193,8 +196,21 @@ class MainWindow(QMainWindow):
                     if gyerek.sz_id == id:
                         gyerekek.append(gyerek)
             NETAK.generateNETAK(nev,ado,gyerekek)
-            self.dialog = PDFView(filename="netak.pdf")
-            self.dialog.show()
+            self.pdf = subprocess.run(['start', '', "netak.pdf"], check=True, shell=True)
+
+    def makeCSJK(self):
+        if self.tabs_widget.tab1.searchCB.currentIndex() > -1:
+            id = int(self.tabs_widget.tab1.searchCB.currentText().split('.')[0])
+            nev = self.tabs_widget.tab1.szemadatF.nameT.text()
+            ado = self.tabs_widget.tab1.szemadatF.adoT.text()
+            gyerekek = []
+            for gyerek in self.Gyerekek:
+                if gyerek is not None:
+                    if gyerek.sz_id == id:
+                        gyerekek.append(gyerek)
+            CSJK.generateCSJK(nev,ado,gyerekek)
+            self.pdf = subprocess.run(['start', '', "csjk.pdf"], check=True, shell=True)
+
 
 
 
