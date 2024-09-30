@@ -155,6 +155,7 @@ def fillOrvosiData(window:any):
                     dolOrv = datetime.date(int(y),int(m),int(d))
                     if dolOrv < newtime:
                         oData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_hely,dolgozo.sz_ido[0:10],dolgozo.a_nev,dolgozo.cim,dolgozo.taj_sz.replace("-",""),dolgozo.orvosi[0:10].replace('-','.')))
+        oData.sort(key=lambda x: x[1])
         oData.append(("","","","","","","",""))
         model = orvosiTM(oData)
         window.tabs_widget.tab2.table.setModel(model)
@@ -167,6 +168,7 @@ def fillProgramData(window:any):
         for dolgozo in window.Dolgozok:
                 if dolgozo is not None and dolgozo.pid == id:
                     progData.append((dolgozo.id,dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.ado_sz,dolgozo.jog_k[0:10].replace('-','.')))
+        progData.sort(key=lambda x: x[1])
         progData.append(("","","","","","","",""))
         model = progTM(progData)
         window.tabs_widget.tab3.table.setModel(model)
@@ -192,6 +194,7 @@ def FillMunkairanyitoData(window:any):
         for dolgozo in window.Dolgozok:
             if dolgozo is not None and dolgozo.mir == id:
                     munkairData.append((dolgozo.id, dolgozo.nev,dolgozo.sz_ido[0:10].replace('-','.'),dolgozo.taj_sz,dolgozo.jog_v[0:10].replace('-','.')))
+        munkairData.sort(key=lambda x: x[1])
         munkairData.append(("","","","",""))
         model = mirTM(munkairData)
         window.tabs_widget.tab5.table.setModel(model)
@@ -250,8 +253,6 @@ def delMunkairanyito(window:any):
         ref.child(id[0]).set({})
         window.Munkairanyitok = FB.getMunkairanyitok()
         fillMunkairanyitoCB(window)
-
-
 
 def settingsProgramok(window:any):
     if window.tabs_widget.tab6.pgCb.currentText() != "":

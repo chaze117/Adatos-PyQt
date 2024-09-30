@@ -21,7 +21,7 @@ import locale
 import os,subprocess, time
 import win32api
 import datetime
-import win32com.client
+import shutil
 
 
 
@@ -60,6 +60,8 @@ class MainWindow(QMainWindow):
 
         self.tabs_widget.tab4.refresh.clicked.connect(lambda: F.fillTuzeloData(self,True))
         self.tabs_widget.tab4.print.clicked.connect(self.MakeTuzelo)
+
+        self.tabs_widget.tab3.rename.clicked.connect(self.Renamedoc)
 
         self.tabs_widget.tab6.mknew.clicked.connect(self.newMunkakor)
         self.tabs_widget.tab6.mkedit.clicked.connect(lambda: F.modMunkakor(self))
@@ -103,7 +105,11 @@ class MainWindow(QMainWindow):
 
         self.tabs_widget.tab1.searchCB.setInsertPolicy(QComboBox.NoInsert)
 
-
+    def closeEvent(self, event):
+        files = os.listdir(os.getcwd())
+        for file in files: 
+            if ".pdf" in file:
+                os.remove(file)
 
 
     def newDolgozo(self):
@@ -172,13 +178,11 @@ class MainWindow(QMainWindow):
                 jogvAdatok.jkD.date().toString("yyyy.MM.dd."),
                 jogvAdatok.jvD.date().toString("yyyy.MM.dd."),
                 ])
-            self.dialog = PDFView(filename="mig.pdf")
-            self.dialog.show()
+            self.pdf = subprocess.run(['start', '', "mig.pdf"], check=True, shell=True)
 
     def MakeTuzelo(self):
         Tuz.generateTuzelo(self.Dolgozok)
-        self.dialog = PDFView(filename="tuzelo.pdf")
-        self.dialog.show()
+        self.pdf = subprocess.run(['start', '', "tuzelo.pdf"], check=True, shell=True)
 
     def Jelenleti(self):
         _date = datetime.date(self.tabs_widget.tab5.honap.date().year(),self.tabs_widget.tab5.honap.date().month(),1)
@@ -210,6 +214,16 @@ class MainWindow(QMainWindow):
                         gyerekek.append(gyerek)
             CSJK.generateCSJK(nev,ado,gyerekek)
             self.pdf = subprocess.run(['start', '', "csjk.pdf"], check=True, shell=True)
+    
+    def Renamedoc(self):
+        if self.tabs_widget.tab3.progCB.currentIndex() > -1:
+            id = int(self.tabs_widget.tab3.progCB.currentText().split('.')[0])
+            _Dolgozok = []
+            for dolgozo in self.Dolgozok:
+                if dolgozo != None and dolgozo.pid == id:
+                    _Dolgozok.append(dolgozo)
+            self.dialog = RenameDoc(parent=self,dolgozok=_Dolgozok)
+            self.dialog.show() 
 
 
 
@@ -675,57 +689,74 @@ class NewNETAK(QMainWindow):
         ref.child(str(gyerek.id)).set(m)
         self.close()
 
-class PDFView(QMainWindow):
-    def __init__(self, *args,filename=None, **kwargs):
-        super(PDFView,self).__init__(*args, **kwargs)
-        self.setWindowTitle(f"PDF Olvasó: {filename}")
+class RenameDoc(QMainWindow):
+    def __init__(self, *args, parent=None, dolgozok=None, **kwargs):
+        super(RenameDoc,self).__init__(*args,parent,**kwargs)
+        self.dolgozok = dolgozok
+        self.filePath =""
+        self.setWindowTitle("Átnevezés elektronikus beküldéshez")
         self.setWindowIcon(QIcon('icon.ico'))
-        self.showMaximized()
-        self.filename = filename
-        layout = QVBoxLayout()
-        self.web_view = QWebEngineView()
-        self.settings = self.web_view.settings()
-        self.settings.setAttribute(self.settings.WebAttribute.PluginsEnabled, True)
-        self.settings.setAttribute(self.settings.WebAttribute.PdfViewerEnabled, True)
-        self.settings.setAttribute(self.settings.WebAttribute.JavascriptCanOpenWindows, True)
-        self.settings.setAttribute(self.settings.WebAttribute.PrintElementBackgrounds, True)
-        self.web_view.page().printRequested.connect(self.handle_print_requested)
-        layout.addWidget(self.web_view)
-        self.container = QWidget()
-        self.container.setLayout(layout)
-        self.setCentralWidget(self.container)
-        cwd = os.getcwd()
-        self.fullpath = rf"{cwd}\{filename}"
-        self.web_view.setUrl(QUrl.fromLocalFile(self.fullpath))
+        self.MainFrame = QFrame()
+        self.setFixedSize(490,120)
+        self.MainFrame.setStyleSheet('font: bold 10pt; font-family: Arial;')
+        self.setCentralWidget(self.MainFrame)
+        self.MainFrame.layout = QGridLayout()
+        self.MainFrame.setLayout(self.MainFrame.layout)
 
-    def handle_print_requested(self):
-        if not self.fullpath:
-            print("No PDF file loaded for printing.")
-            return
-        self.show_print_dialog()
+        self.path = QLineEdit()
+        self.MainFrame.layout.addWidget(self.path,0,0)
+        self.selFol = QPushButton()
+        self.selFol.setText("...")
+        self.MainFrame.layout.addWidget(self.selFol,0,1)
+        self.selFol.clicked.connect(self.select_folder)
+        self.selType = QComboBox()
+        self.MainFrame.layout.addWidget(self.selType,1,0,alignment=Qt.AlignmentFlag.AlignTop)
+        self.selType.addItems(["Megkeresések iratai",
+                                "Levonás iratok",
+                                "Új jogviszonyhoz kapcsolódó iratok",
+                                "Egyéb ügyiratok",
+                                "ÜB jegyzőkönyvek",
+                                "CSED/GYED igénybejelentések",
+                                "Jogviszony megszüntetés iratok",
+                                "Letiltás iratok",
+                                "Papír alapú adóelőleg nyilatkozatok",
+                                "Évi táppénzes papírok"])
+        self.renamebtn = QPushButton(qta.icon('ei.pencil'),"")
+        self.renamebtn.setIconSize(QSize(40,40))
+        self.renamebtn.setToolTip("Átnevezés elektronikus beküldéshez")
+        self.renamebtn.setFixedSize(50,50)
+        self.renamebtn.clicked.connect(self.rename)
+        self.MainFrame.layout.addWidget(self.renamebtn,1,1)
+
     
-    def show_print_dialog(self):
-        """Shows a print dialog and prints the file."""
-        printer = QPrinter()
-        if self.filename == "jelenleti.pdf":
-            print("Works")
-            printer.setPageSize(QPageSize(QPageSize.PageSizeId.A3))
-            
-        dialog = QPrintDialog(printer, self)
-        if dialog.exec() == QPrintDialog.DialogCode.Accepted:
-            self.print_file_with_printer()
+
+    def select_folder(self):
+        folder = QFileDialog.getExistingDirectory(self, "Select Folder")
+        if folder:
+            self.path.setText(f"{folder}")
+            self.filePath = f"{folder}"
     
-    def print_file_with_printer(self):
-        if not os.path.exists(self.fullpath):
-            print(f"File {self.fullpath} does not exist.")
-            return
-        try:
-            win32api.ShellExecute(0, "print", self.fullpath, None, ".", 0)
-        except:
-            print("exeption")
-        
-
-    def closeEvent(self, event):
-        os.remove(self.filename)
-        event.accept()
-
+    def rename(self):
+        selected = self.selType.currentIndex()
+        baseName = ""
+        eloado = "_1_X0505411.pdf"
+        for dolgozo in self.dolgozok:
+            match selected: 
+                case 0: baseName = f"kirakat_MKER_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"
+                case 1: baseName = f"kirakat_LEV_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"
+                case 2: baseName = f"kirakat_KINEV_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"
+                case 3: baseName = f"kirakat_EGYEB_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"
+                case 4: baseName = f"kirakat_UB_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"
+                case 5: baseName = f"kirakat_GYED_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"
+                case 6: baseName = f"kirakat_MEGSZP_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"
+                case 7: baseName = f"kirakat_LETP_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"
+                case 8: baseName = f"kirakat_ANYP_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"
+                case 9: baseName = f"kirakat_TP_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"
+            filename = f"{self.filePath}/{dolgozo.nev}.pdf"
+            if os.path.exists(filename):
+                os.rename(filename,f"{self.filePath}/{baseName}")
+            else: 
+                filename = f"{self.filePath}/{str(dolgozo.nev).replace('ö','o').replace('ü','u').replace('ó','o').replace('ő','o').replace('ú','u').replace('é','e').replace('á','a').replace('ű','u').replace('í','i')}.pdf"
+                if os.path.exists(filename):
+                    os.rename(filename,f"{self.filePath}/{baseName}")
+        self.close()
