@@ -377,3 +377,8 @@ def delNETAK(window:any):
         ref.child(id[0]).set({})
         window.Gyerekek_n = FB.getNGyerekek()
         fillNETAK(window,int(pid[0]))
+
+def saveEloado(window:any):
+    eloado = window.tabs_widget.tab6.eloadoTxT.text()
+    ref = db.reference('beallitasok')
+    ref.child('eloado').set(eloado)

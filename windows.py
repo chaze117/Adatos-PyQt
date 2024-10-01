@@ -77,6 +77,8 @@ class MainWindow(QMainWindow):
         self.tabs_widget.tab6.pgedit.clicked.connect(lambda: F.modProgram(self))
         self.tabs_widget.tab6.pgdel.clicked.connect(lambda: F.delProgram(self))
 
+        self.tabs_widget.tab6.eloadoSave.clicked.connect(lambda: F.saveEloado(self))
+
         self.Dolgozok = FB.getDolgozok()
         self.Gyerekek = FB.getGyerekek()
         self.Gyerekek_n = FB.getNGyerekek()
@@ -739,7 +741,7 @@ class RenameDoc(QMainWindow):
     def rename(self):
         selected = self.selType.currentIndex()
         baseName = ""
-        eloado = "_1_X0505411.pdf"
+        eloado = f"_1_{FB.getEloado()}.pdf"
         for dolgozo in self.dolgozok:
             match selected: 
                 case 0: baseName = f"kirakat_MKER_{datetime.datetime.now().year}_726357_{dolgozo.ado_sz}_{datetime.datetime.now().strftime('%Y%m%d')}{eloado}"

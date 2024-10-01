@@ -56,9 +56,10 @@ class DraggableTableWidget(QTableWidget):
         # Add the dropped data as a new row
         row_position = self.rowCount()
         self.setRowCount(row_position + 1)
-
+        
         for column, text in enumerate(dropped_text):
             self.setItem(row_position, column, QTableWidgetItem(text))
+            print(text)
 
         event.acceptProposedAction()
 

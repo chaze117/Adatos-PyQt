@@ -2,6 +2,7 @@ from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 import qtawesome as qta
+import Components.firebase as FB
 import qdarktheme
 
 class Beallitasok(QWidget):
@@ -151,5 +152,20 @@ class Beallitasok(QWidget):
         self.pgdel.setToolTip("Program törlése")
         self.pgButGrid.layout.addWidget(self.pgdel,0,2)
         #endregion
-        self.layout.addWidget(self.nullFrame,0,1)
+        self.eloado = QGroupBox()
+        self.eloado.setTitle("Kincstári Előadó")
+        self.eloado.setFixedSize(380,105)
+        self.eloado.layout = QGridLayout()
+        self.layout.addWidget(self.eloado,0,1,alignment=Qt.AlignmentFlag.AlignTop)
+        self.eloado.setLayout(self.eloado.layout)
+        self.eloadoTxT = QLineEdit()
+        self.eloado.layout.addWidget(self.eloadoTxT,0,0)
+        self.eloadoTxT.setText(FB.getEloado())
+        self.eloadoSave = QPushButton(qta.icon('fa.floppy-o'),"")
+        self.eloadoSave.setIconSize(QSize(40,40))
+        self.eloadoSave.setFixedSize(50,50)
+        self.eloadoSave.setToolTip("Mentés")
+        self.eloado.layout.addWidget(self.eloadoSave,1,0,alignment=Qt.AlignmentFlag.AlignRight)
+        self.layout.addWidget(self.nullFrame,0,2)
 
+    

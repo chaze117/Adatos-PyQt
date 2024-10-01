@@ -62,5 +62,9 @@ def getSzamlaszamok():
     for i in range(0,len(_temp)):
         Szamlaszamok.append(Szamlaszam.from_dict(_temp[i]))
     return Szamlaszamok
-    
+
+def getEloado():
+    ref = db.reference("beallitasok/eloado")
+    eloado = ref.get()
+    return eloado
     
