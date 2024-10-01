@@ -4,6 +4,8 @@ from PyQt6.QtCore import *
 from typing import Any
 from dataclasses import dataclass
 import json
+from firebase_admin import db
+
 
 
 class ExtendedComboBox(QComboBox):
@@ -249,3 +251,105 @@ class Szamlaszam:
                         _id = int(obj.get("id"))
                         _base64 = str(obj.get("base64"))
                         return Szamlaszam(_id,_base64)
+                
+class ToggleButton(QPushButton):
+    def __init__(self, parent=None):
+        super().__init__("Munkairányító", parent)
+        self.setCheckable(True)  # Allows the button to have checked/unchecked states
+        self.setFixedSize(200, 40)
+        self.setStyleSheet(self.get_stylesheet(False))
+        self.toggled.connect(self.on_toggled)
+
+    def on_toggled(self, checked):
+        self.setText("Program" if checked else "Munkairányító")
+
+
+
+    def get_stylesheet(self, checked):
+        if checked:
+            return """
+                QPushButton {
+                    background-color: green;
+                    color: white;
+                    border: 2px solid #5A5A5A;
+                    border-radius: 20px;
+                }
+            """
+        else:
+            return """
+                QPushButton {
+                    background-color: lightgray;
+                    color: black;
+                    border: 2px solid #5A5A5A;
+                    border-radius: 20px;
+                }
+            """
+    def getMunkairanyitok():
+        ref = db.reference("munkairanyitok")
+        _temp = ref.get()
+        Munkairanyitok = []
+        for i in range(0,len(_temp)):
+            Munkairanyitok.append(Munkairanyito.from_dict(_temp[i]))
+        return Munkairanyitok
+        
+class DraggableTableWidget(QTableWidget):
+    def __init__(self, rows, columns):
+        super().__init__(rows, columns)
+        self.setDragEnabled(True)
+        self.setAcceptDrops(True)
+        self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
+        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.setHorizontalHeaderLabels(["ID","Név","Születési idő"])
+
+    def startDrag(self, supportedActions):
+        drag = QDrag(self)
+        mime_data = QMimeData()
+
+        selected_items = self.selectedItems()
+        if not selected_items:
+            return
+
+        # Extract the row of the first selected item
+        row = selected_items[0].row()
+        
+        # Collect all column data for this row
+        self.dragged_row_data = [self.item(row, col).text() for col in range(self.columnCount())]
+        
+        # Set the dragged row data as text in MIME data
+        mime_data.setText("\n".join(self.dragged_row_data))
+        drag.setMimeData(mime_data)
+
+        # Execute the drag and drop operation
+        drop_action = drag.exec(Qt.DropAction.MoveAction)
+
+        # Remove the row if the drag operation was successful
+        if drop_action == Qt.DropAction.MoveAction:
+            self.removeRow(row)
+
+    def dragEnterEvent(self, event):
+        if event.source() != self:
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        if event.source() == self:
+            event.ignore()
+            return
+
+        # Retrieve the dropped data as a list of strings
+        dropped_text = event.mimeData().text().splitlines()
+        
+        # Add the dropped data as a new row
+        row_position = self.rowCount()
+        self.setRowCount(row_position + 1)
+        
+        for column, text in enumerate(dropped_text):
+            self.setItem(row_position, column, QTableWidgetItem(text))
+            print(text)
+
+        event.acceptProposedAction()
