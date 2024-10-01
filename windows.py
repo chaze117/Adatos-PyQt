@@ -36,6 +36,14 @@ class MainWindow(QMainWindow):
         self.setFixedSize(1165,height)
         self.setWindowIcon(QIcon('icon.ico'))
 
+        self.Dolgozok = FB.getDolgozok()
+        self.Gyerekek = FB.getGyerekek()
+        self.Gyerekek_n = FB.getNGyerekek()
+        self.Munkairanyitok = FB.getMunkairanyitok()
+        self.Munkakorok = FB.getMunkakorok()
+        self.Programok = FB.getProgramok()
+        self.Szamlaszamok = FB.getSzamlaszamok()
+
         self.tabs_widget= tabs.Tabs(self)
         self.setCentralWidget(self.tabs_widget)
         self.setStyleSheet('font-size: 10pt; font-family: Arial;')
@@ -79,13 +87,7 @@ class MainWindow(QMainWindow):
 
         self.tabs_widget.tab6.eloadoSave.clicked.connect(lambda: F.saveEloado(self))
 
-        self.Dolgozok = FB.getDolgozok()
-        self.Gyerekek = FB.getGyerekek()
-        self.Gyerekek_n = FB.getNGyerekek()
-        self.Munkairanyitok = FB.getMunkairanyitok()
-        self.Munkakorok = FB.getMunkakorok()
-        self.Programok = FB.getProgramok()
-        self.Szamlaszamok = FB.getSzamlaszamok()
+        
 
         F.fillSearchCB(self)
         F.fillMunkakorCB(self)

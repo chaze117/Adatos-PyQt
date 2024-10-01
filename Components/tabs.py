@@ -22,7 +22,7 @@ class Tabs(QWidget):
         self.tab4 = tuzelo.Tuzelo(self.tabs)
         self.tab5 = munkairanyito.Munkairanyito(self.tabs)
         self.tab6 = beallitasok.Beallitasok(self.tabs) 
-        self.tab7 = Lista.Lista(self.tabs)  
+        self.tab7 = Lista.Lista(self.tabs,window=self.parent())  
         # Add tabs
         self.tabs.addTab(self.tab1,"Fő Adatok")
         self.tabs.addTab(self.tab2,"Orvosi")

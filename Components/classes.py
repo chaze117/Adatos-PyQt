@@ -301,7 +301,6 @@ class DraggableTableWidget(QTableWidget):
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
         self.setHorizontalHeaderLabels(["ID","Név","Születési idő"])
-
     def startDrag(self, supportedActions):
         drag = QDrag(self)
         mime_data = QMimeData()
@@ -343,13 +342,11 @@ class DraggableTableWidget(QTableWidget):
 
         # Retrieve the dropped data as a list of strings
         dropped_text = event.mimeData().text().splitlines()
-        
         # Add the dropped data as a new row
         row_position = self.rowCount()
         self.setRowCount(row_position + 1)
         
         for column, text in enumerate(dropped_text):
             self.setItem(row_position, column, QTableWidgetItem(text))
-            print(text)
 
         event.acceptProposedAction()
