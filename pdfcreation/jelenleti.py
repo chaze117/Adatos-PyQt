@@ -15,6 +15,7 @@ locale.setlocale(locale.LC_ALL,'hu_HU.UTF-8')
 registerFont(TTFont('Verdana', 'Verdana.ttf'))
 registerFont(TTFont('TNRB', 'timesbd.ttf'))
 content = []
+
 header_style = ParagraphStyle(
     'header_style',
     fontName='TNRB',  
@@ -28,8 +29,6 @@ date_style = ParagraphStyle(
         fontSize=14,  
         alignment=2,  
         spaceAfter=5)
-
-
 
 HeaderStyle = TableStyle([
     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -75,7 +74,6 @@ def generateJelenleti(date:date,progname,dolgozok):
 
     document.build(content)
     
-
 def calculate_easter(year):
     # Meeus/Jones/Butcher algorithm for calculating Easter date
     a = year % 19

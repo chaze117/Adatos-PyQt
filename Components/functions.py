@@ -140,8 +140,7 @@ def fillMunkairanyitoCB(window:any):
         window.tabs_widget.tab1.jvF.mirC.addItem(f"{munkairanyito.id}. {munkairanyito.nev}")
         window.tabs_widget.tab5.munkCB.addItem(f"{munkairanyito.id}. {munkairanyito.nev}")
         window.tabs_widget.tab6.miCb.addItem(f"{munkairanyito.id}. {munkairanyito.nev}")
-       
-        
+              
 def fillOrvosiData(window:any):
     today = date.today()
     window.tabs_widget.tab2.oLabel.setText(f"Lejár {window.tabs_widget.tab2.oSlider.value()} napon belül")

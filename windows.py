@@ -17,6 +17,7 @@ import pdfcreation.tuzelo as Tuz
 import pdfcreation.jelenleti as J
 import pdfcreation.netak as NETAK
 import pdfcreation.csjk as CSJK
+import pdfcreation.tp as TP
 import locale
 import os,subprocess, time
 import win32api
@@ -53,6 +54,7 @@ class MainWindow(QMainWindow):
         self.tabs_widget.tab1.buttonsF.editD.clicked.connect(lambda: F.modDolgozo(self))
         self.tabs_widget.tab1.buttonsF.delD.clicked.connect(lambda: F.delDolgozo(self))
         self.tabs_widget.tab1.buttonsF.mki.clicked.connect(self.MakeMig)
+        self.tabs_widget.tab1.buttonsF.tp.clicked.connect(self.TPA)
 
         self.tabs_widget.tab1.adoF.tab1.newCSJK.clicked.connect(self.newCSJK)
         self.tabs_widget.tab1.adoF.tab1.editCSJK.clicked.connect(lambda: F.modCSJK(self))
@@ -227,10 +229,14 @@ class MainWindow(QMainWindow):
                 if dolgozo != None and dolgozo.pid == id:
                     _Dolgozok.append(dolgozo)
             self.dialog = RenameDoc(parent=self,dolgozok=_Dolgozok)
-            self.dialog.show() 
-
-
-
+            self.dialog.show()
+    
+    def TPA(self):
+        if self.tabs_widget.tab1.searchCB.currentIndex() > -1:
+            id = int(self.tabs_widget.tab1.searchCB.currentText().split('.')[0])
+            dolgozo = list(filter(lambda dolgozo: dolgozo is not None and dolgozo.id == id,self.Dolgozok))
+            self.dialog = TPAtveteli(nev=dolgozo[0].nev,ado=dolgozo[0].ado_sz,taj=dolgozo[0].taj_sz)
+            self.dialog.show()
 
 class NewDolgozo(QMainWindow):
     def __init__(self, *args,parent=None, **kwargs):
@@ -764,3 +770,83 @@ class RenameDoc(QMainWindow):
                 if os.path.exists(filename):
                     os.rename(filename,f"{self.filePath}/{baseName}")
         self.close()
+
+class TPAtveteli(QMainWindow):
+    def __init__(self, *args,nev,ado,taj,**kwargs):
+        super(TPAtveteli,self).__init__(*args, **kwargs)
+        self.nev = nev
+        self.ado = ado
+        self.taj = taj
+        self.setWindowTitle("Táppénz átvételi elismervény")
+        self.setWindowIcon(QIcon('icon.ico'))
+        self.MainFrame = QFrame()
+        self.setFixedSize(750,400)
+        self.MainFrame.setStyleSheet('font: bold 10pt; font-family: Arial;')
+        self.setCentralWidget(self.MainFrame)
+        self.MainFrame.layout = QGridLayout()
+        self.MainFrame.setLayout(self.MainFrame.layout)
+        
+        self.irattype = QComboBox()
+        self.irattype.addItems(["Kereőképtelen állományba vétel","Folyamatos keresőképtelenség","Kórházi Igazolás","Egyéb"])
+        self.MainFrame.layout.addWidget(self.irattype,0,0)
+
+        self.kezd = QDateEdit(calendarPopup=True)
+        self.MainFrame.layout.addWidget(self.kezd,0,1)
+
+        self.veg = QDateEdit(calendarPopup = True)
+        self.MainFrame.layout.addWidget(self.veg,0,2)
+
+        self.table = QTableWidget()
+        self.MainFrame.layout.addWidget(self.table,1,0,1,2)
+        self.table.setRowCount(1)
+        self.table.setColumnCount(4)
+
+        self.buttonF = QFrame()
+        self.buttonF.layout = QGridLayout()
+        self.buttonF.setLayout(self.buttonF.layout)
+        self.MainFrame.layout.addWidget(self.buttonF,1,2,alignment=Qt.AlignmentFlag.AlignTop)
+        self.addrow = QPushButton(qta.icon('ei.plus'),"")
+        self.addrow.setIconSize(QSize(40,40))
+        self.addrow.setToolTip("Hozzáadás")
+        self.addrow.setFixedSize(50,50)
+        self.buttonF.layout.addWidget(self.addrow,0,0)
+        self.addrow.clicked.connect(self.addRow)
+
+        self.printbtn = QPushButton(qta.icon('fa.print'),"")
+        self.printbtn.setIconSize(QSize(40,40))
+        self.printbtn.setToolTip("Nyomtatás")
+        self.printbtn.setFixedSize(50,50)
+        self.printbtn.clicked.connect(lambda: self.print(nev=self.nev,ado=self.ado,taj=self.taj))
+        self.buttonF.layout.addWidget(self.printbtn,0,1)
+    
+    def addRow(self):
+    # Insert a new row at the end
+        row_position = self.table.rowCount()
+        self.table.insertRow(row_position)
+
+        # Set the value for each cell in the new row
+        self.table.setItem(row_position-1, 0, QTableWidgetItem(self.irattype.currentText()))
+        self.table.setItem(row_position-1, 1, QTableWidgetItem(self.kezd.text()))  # Start date
+        self.table.setItem(row_position-1, 2, QTableWidgetItem(self.veg.text()))   # End date
+
+        # Optionally, add a delete button or checkbox in the last column
+        delete_button = QPushButton("Törlés")
+        self.table.setCellWidget(row_position-1, 3, delete_button)
+        delete_button.clicked.connect(lambda: self.delrow(row_position))
+        self.table.setHorizontalHeaderLabels(["Megnevezés","Kezdete","Vége","Törlés"])
+        self.table.resizeColumnsToContents()
+    
+    def delrow(self,row):
+        if self.table.rowCount() > 1: row -= 1
+        self.table.removeRow(row)
+    
+    def print(self,nev,ado,taj):
+        row_count = self.table.rowCount()
+        column_count = self.table.columnCount()
+
+        row_data = []
+        for row in range(row_count):
+            if self.table.item(row,0) is not None:
+                row_data.append([self.table.item(row, 0).text(),self.table.item(row, 1).text(),self.table.item(row, 2).text()])
+        TP.generateTP(nev=nev,ado=ado,taj=taj,data=row_data)
+        self.pdf = subprocess.run(['start', '', "tp.pdf"], check=True, shell=True)
