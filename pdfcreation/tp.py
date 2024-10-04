@@ -87,7 +87,7 @@ def generateTP(nev,ado,taj,data):
     y_start = PAGE_HEIGHT-350  # Y coordinate for the start of the table
     cell_width = 100  # Width of each cell
     cell_heights = 20  # Height of each cell
-    num_rows = len(data)     # Number of rows
+    num_rows = len(data)+1     # Number of rows
     num_cols = 8   
     data2 = [
             ["Megnevezés", "Kezdete", "Vége"]
@@ -117,7 +117,7 @@ def generateTP(nev,ado,taj,data):
         # Draw the last vertical line at the end of the last column
     c.line(current_x, y_start, current_x, y_start - num_rows * cell_heights)
     c.setFont("TNR",12)
-    for row_idx, row in enumerate(data):
+    for row_idx, row in enumerate(data2):
         current_x = x_start  # Reset x position for each row
         for col_idx, cell in enumerate(row):
             # Calculate text position within the cell
