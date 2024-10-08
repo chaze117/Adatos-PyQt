@@ -89,3 +89,4 @@ class Tuzelo(QTabWidget):
         fillAllDolgozo(self.window)
         fillTuzeloData(self.window,True)
         event.acceptProposedAction()
+        #for git update
