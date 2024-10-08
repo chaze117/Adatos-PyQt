@@ -96,6 +96,7 @@ class MainWindow(QMainWindow):
         F.fillProgramCB(self)
         F.fillMunkairanyitoCB(self)
         F.fillTuzeloData(self,False)
+        F.fillAllDolgozo(self)
 
         self.tabs_widget.tab1.searchCB.currentIndexChanged.connect(lambda: F.SelectedDolgozo(self))
         self.tabs_widget.tab1.adoF.tab1.CSJKCB.currentIndexChanged.connect(lambda: F.SelectedCSJK(self.tabs_widget.tab1.adoF.tab1.CSJKCB.currentIndex(),self))
