@@ -14,12 +14,13 @@ class Tabs(QWidget):
         super(QWidget,self).__init__(parent)
         self.setStyleSheet(' font: bold')
         self.layout = QVBoxLayout(self)
+        self.window = parent
         # Initialize tab screen
         self.tabs = QTabWidget()
         self.tab1 = foadatok.FoAdatok(self.tabs)
         self.tab2 = orvosi.Orvosi(self.tabs)
         self.tab3 = programok.Programok(self.tabs)
-        self.tab4 = tuzelo.Tuzelo(self.tabs)
+        self.tab4 = tuzelo.Tuzelo(parent=self.window)
         self.tab5 = munkairanyito.Munkairanyito(self.tabs)
         self.tab6 = beallitasok.Beallitasok(self.tabs) 
         self.tab7 = Lista.Lista(self.tabs,window=self.parent())  

@@ -2,7 +2,6 @@ import datetime
 from datetime import date, timedelta
 from Components.orvosi import TableModel as orvosiTM
 from Components.programok import TableModel as progTM
-from Components.tuzelo import TableModel as tuzeloTM
 from Components.munkairanyito import TableModel as mirTM
 import Components.firebase as FB
 from firebase_admin import db
@@ -176,6 +175,8 @@ def fillProgramData(window:any):
 def fillTuzeloData(window:any, refresh:bool):
     if refresh is True:
         window.Dolgozok = FB.getDolgozok()
+        window.tabs_widget.tab4.tuzelotable.clear()
+        window.tabs_widget.tab4.tuzelotable.setRowCount(0)
     tuzeloData = []
     for dolgozo in window.Dolgozok:
         if dolgozo is not None and dolgozo.tuzelo == True:
@@ -183,8 +184,23 @@ def fillTuzeloData(window:any, refresh:bool):
                 hsz = cim[len(cim)-1].replace('.','')
                 tuzeloData.append((dolgozo.id,dolgozo.nev,cim[0],hsz))
     tuzeloData = sorted(tuzeloData, key = lambda x: (x[2], int(x[3])))
-    model = tuzeloTM(tuzeloData)
+    model = TuzeloTableModel(tuzeloData)
     window.tabs_widget.tab4.table.setModel(model)
+    for dolgozo in tuzeloData:
+        window.tabs_widget.tab4.tuzelotable.addRow(dolgozo)
+
+def fillAllDolgozo(window:any,text=''):
+    window.tabs_widget.tab4.alltable.clear()
+    window.tabs_widget.tab4.alltable.setRowCount(0)
+    allDolgozo = []
+    for dolgozo in window.Dolgozok:
+        if dolgozo is not None and dolgozo.tuzelo == False and text.lower() in dolgozo.nev.lower():
+                cim = dolgozo.cim.split(" ")
+                hsz = cim[len(cim)-1].replace('.','')
+                allDolgozo.append((dolgozo.id,dolgozo.nev,cim[0],hsz))
+    allDolgozo = sorted(allDolgozo,key = lambda x: x[1])
+    for dolgozo in allDolgozo:
+        window.tabs_widget.tab4.alltable.addRow(dolgozo)
 
 def FillMunkairanyitoData(window:any):
     if window.tabs_widget.tab5.munkCB.currentText() != '':

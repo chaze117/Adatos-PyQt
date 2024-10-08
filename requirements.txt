@@ -8,3 +8,4 @@ reportlab==4.2.2
 svglib==1.5.1
 PyQtDarkTheme-fork==2.3.2
 PyQt6-WebEngine==6.7.0
+GitPython==3.1.43
