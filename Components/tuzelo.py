@@ -54,6 +54,7 @@ class Tuzelo(QTabWidget):
         self.t2.layout.addWidget(self.tuzelotable,1,1)
 
         self.tuzelotable.dropEvent = self.drop2
+        self.alltable.dropEvent = self.drop1
 
     def drop2(self,event):
         if event.source() == self:
@@ -69,7 +70,7 @@ class Tuzelo(QTabWidget):
         ref = db.reference(f"dolgozok/{id}")
         ref.child("tuzelo").set(True)
         self.window.Dolgozok = getDolgozok()
-        fillAllDolgozo(self.window)
+        fillAllDolgozo(self.window,self.search.text())
         fillTuzeloData(self.window,True)
         event.acceptProposedAction()
 
@@ -86,7 +87,7 @@ class Tuzelo(QTabWidget):
         ref = db.reference(f"dolgozok/{id}")
         ref.child("tuzelo").set(False)
         self.window.Dolgozok = getDolgozok()
-        fillAllDolgozo(self.window)
+        fillAllDolgozo(self.window,self.search.text())
         fillTuzeloData(self.window,True)
         event.acceptProposedAction()
         #for git update
